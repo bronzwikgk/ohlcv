@@ -1,0 +1,91 @@
+body {
+  background: #f7f7f7;
+  color: #222;
+  font-family: Arial, sans-serif;
+  margin: 24px;
+}
+
+details {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin: 12px 0;
+  overflow-x: auto;
+}
+
+summary {
+  background: #eee;
+  font-weight: bold;
+  left: 0;
+  padding: 12px;
+  position: sticky;
+}
+
+table {
+  background: #fff;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+td,
+th {
+  border-top: 1px solid #e5e5e5;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  width: 100%;
+}
+
+table.wide-table {
+  min-width: 900px;
+  width: 100%;
+}
+
+table.compact-table {
+  margin: 0 12px 12px 12px;
+  min-width: 520px;
+  width: max-content;
+}
+
+table.metric-table {
+  margin: 0 12px 12px 12px;
+  min-width: 320px;
+  width: max-content;
+}
+
+table.metric-table td:first-child {
+  min-width: 190px;
+}
+
+table.metric-table td:last-child {
+  min-width: 110px;
+}
+
+.number {
+  text-align: right;
+}
+
+.expression {
+  font-family: Consolas, monospace;
+  font-size: 12px;
+  max-width: 520px;
+  min-width: 220px;
+  white-space: normal;
+}
+
+.condition-list {
+  display: grid;
+  gap: 8px;
+  min-width: 260px;
+}
+
+.condition-values {
+  color: #555;
+  font-size: 12px;
+  margin-top: 3px;
+}

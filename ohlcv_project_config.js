@@ -6,7 +6,7 @@ var ohlcv_project_config = {
     version: "v0.1_config_first",
     objective: "Mine role-based short-term trading conditions, validate on held-out stocks, then pass selected rules into backtesting.",
     default_run_mode: "mine",
-    active_roles: ["regime"],
+    active_roles: ["regime", "setup", "trigger", "quality", "risk_avoid"],
     notes: [
       "Keep config as the single source of truth.",
       "Feature families are defined once in feature_registry.",
@@ -29,7 +29,7 @@ var ohlcv_project_config = {
     enabled: true,
     source_dir: "D:\\0dot1_Aug_2016_master\\data\\mstock_mtf_daily_data",
     file_pattern: ".csv",
-    number_of_stocks_to_load: 25,
+    number_of_stocks_to_load: 250,
     number_of_years_of_data: 6,
     seed: 21,
     window_end_date: "2023-12-31",
@@ -68,6 +68,21 @@ var ohlcv_project_config = {
     periods: [1, 3, 5, 8],
     thresholds_pct: [3],
     role_usage: ["all_mining_roles", "backtest_evaluation"]
+  },
+
+  base_conditions: {
+    enabled: true,
+    operator: "AND",
+    conditions: [
+      {
+        type: "relative_pair_compare",
+        left_column: "adj_close",
+        operator: ">",
+        right_column: "adj_close_sma_21_day",
+        expression: "adj_close > adj_close_sma_21_day"
+      }
+    ],
+    rationale: "Mandatory universe filter applied before mining, selection, and backtesting."
   },
 
   anomaly_cleaning: {
@@ -196,7 +211,7 @@ var ohlcv_project_config = {
     },
     {
       role: "setup",
-      enabled: false,
+      enabled: true,
       order: 2,
       purpose: "Pre-entry price structure inside selected regime.",
       run_inside_roles: ["regime"],
@@ -207,7 +222,7 @@ var ohlcv_project_config = {
     },
     {
       role: "trigger",
-      enabled: false,
+      enabled: true,
       order: 3,
       purpose: "Actual row-level entry timing.",
       run_inside_roles: ["regime", "setup"],
@@ -218,7 +233,7 @@ var ohlcv_project_config = {
     },
     {
       role: "quality",
-      enabled: false,
+      enabled: true,
       order: 4,
       purpose: "Confirm the signal is not noisy.",
       run_inside_roles: ["regime", "setup", "trigger"],
@@ -229,7 +244,7 @@ var ohlcv_project_config = {
     },
     {
       role: "risk_avoid",
-      enabled: false,
+      enabled: true,
       order: 5,
       purpose: "Find conditions to exclude from trading.",
       run_inside_roles: ["regime", "setup", "trigger"],
@@ -245,6 +260,8 @@ var ohlcv_project_config = {
       enabled: true,
       operators: [">"],
       candidate_values: [0],
+      derive_from_data: true,
+      percentile_cutpoints: [5, 10, 20, 30, 40, 50, 60, 70, 80, 90, 95],
       output_kind: "fixed_expression"
     },
     relative_pair_compare: {
@@ -270,7 +287,7 @@ var ohlcv_project_config = {
 
   mining: {
     enabled: true,
-    target_periods: [5],
+    target_periods: [1],
     target_thresholds_pct: [3],
     ranking_defaults: {
       priority: "density_then_coverage",
@@ -319,6 +336,8 @@ var ohlcv_project_config = {
   selected_conditions: {
     enabled: true,
     source: "manual_or_report_selection",
+    selection_mode: "sequential_compatible_top_condition",
+    minimum_rows_after_adding_condition: 25,
     baseline: [],
     setup: [],
     trigger: [],
@@ -327,7 +346,7 @@ var ohlcv_project_config = {
   },
 
   backtesting: {
-    enabled: false,
+    enabled: true,
     class_source: "code_gk_2/ohlcv_gk_backtesting.js",
     dataset: {
       source: "pipeline_result",
@@ -426,14 +445,20 @@ var ohlcv_project_config = {
       latest_alias_enabled: true
     },
     reports: {
-      mining: {
+      combined: {
         enabled: true,
+        file_prefix: "ohlcv_run_report",
+        file_extension: "html",
+        title: "OHLCV Run Report"
+      },
+      mining: {
+        enabled: false,
         file_prefix: "role_mining_report",
         file_extension: "html",
         title: "Role Mining Report"
       },
       backtest: {
-        enabled: true,
+        enabled: false,
         file_prefix: "backtest_report",
         file_extension: "html",
         title: "Backtest Report"

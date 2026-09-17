@@ -12,11 +12,29 @@ class ohlcv_condition_group_builder {
     for (var role_index = 0; role_index < role_defs.length; role_index += 1) {
       var role = role_defs[role_index];
       if (role.enabled === false) continue;
+      if (!this.role_is_active(role.role)) continue;
       roles.push({ role: role.role, order: role.order, ranking: this.ranking_for_role(role.role), condition_groups: this.groups_for_role(role) });
     }
 
     roles.sort(function compare(left, right) { return Number(left.order) - Number(right.order); });
-    return { target_returns: this.config.target_returns, roles: roles };
+    return { target_returns: this.mining_target_config(), roles: roles };
+  }
+
+  role_is_active(role) {
+    var active_roles = this.config.project.active_roles || [];
+    if (!active_roles.length) return true;
+    for (var index = 0; index < active_roles.length; index += 1) if (active_roles[index] === role) return true;
+    return false;
+  }
+
+  mining_target_config() {
+    var target = this.config.target_returns;
+    var mining = this.config.mining || {};
+    return {
+      output_prefix: target.output_prefix,
+      periods: mining.target_periods || target.periods,
+      thresholds_pct: mining.target_thresholds_pct || target.thresholds_pct
+    };
   }
 
   groups_for_role(role) {
@@ -46,9 +64,7 @@ class ohlcv_condition_group_builder {
     var out = [];
     for (var column_index = 0; column_index < columns.length; column_index += 1) {
       for (var operator_index = 0; operator_index < type_config.operators.length; operator_index += 1) {
-        for (var value_index = 0; value_index < type_config.candidate_values.length; value_index += 1) {
-          out.push({ type: "threshold_compare", column: columns[column_index], operator: type_config.operators[operator_index], right_value: type_config.candidate_values[value_index], expression: columns[column_index] + " " + type_config.operators[operator_index] + " " + type_config.candidate_values[value_index] });
-        }
+        out.push({ type: "threshold_compare", column: columns[column_index], operator: type_config.operators[operator_index], candidate_values: type_config.candidate_values || [], derive_from_data: type_config.derive_from_data === true, percentile_cutpoints: type_config.percentile_cutpoints || [], expression: columns[column_index] + " " + type_config.operators[operator_index] + " mined threshold" });
       }
     }
     return out;
@@ -127,11 +143,104 @@ class ohlcv_role_miner {
   constructor(config) { this.config = config; }
 
   mine(built, mining_collection, testing_collection) {
-    var mining_rows = this.flatten(mining_collection);
-    var testing_rows = this.flatten(testing_collection);
+    var full_mining_rows = this.flatten_without_base_conditions(mining_collection);
+    var full_testing_rows = this.flatten_without_base_conditions(testing_collection);
+    var mining_rows = this.apply_base_conditions(full_mining_rows);
+    var testing_rows = this.apply_base_conditions(full_testing_rows);
     var roles = [];
     for (var role_index = 0; role_index < built.roles.length; role_index += 1) roles.push(this.mine_role(built.roles[role_index], mining_rows, testing_rows, built.target_returns));
-    return { mining_row_count: mining_rows.length, testing_row_count: testing_rows.length, roles: roles };
+    return {
+      full_mining_row_count: full_mining_rows.length,
+      full_testing_row_count: full_testing_rows.length,
+      mining_row_count: mining_rows.length,
+      testing_row_count: testing_rows.length,
+      base_condition_funnel: this.base_condition_funnel(full_mining_rows, full_testing_rows, built.target_returns),
+      baseline: this.baseline_results(mining_rows, testing_rows, built.target_returns),
+      roles: roles
+    };
+  }
+
+  base_condition_funnel(full_mining_rows, full_testing_rows, target) {
+    var base = this.config.base_conditions || {};
+    var conditions = base.enabled ? (base.conditions || []) : [];
+    var out = [];
+    var mining_rows = full_mining_rows.slice(0);
+    var testing_rows = full_testing_rows.slice(0);
+    out.push(this.base_condition_funnel_row("Full data after anomaly filters", "", mining_rows, testing_rows, target, full_mining_rows.length, full_testing_rows.length));
+
+    for (var condition_index = 0; condition_index < conditions.length; condition_index += 1) {
+      mining_rows = this.filter_rows_by_condition(mining_rows, conditions[condition_index]);
+      testing_rows = this.filter_rows_by_condition(testing_rows, conditions[condition_index]);
+      out.push(this.base_condition_funnel_row("After base " + (condition_index + 1), this.condition_expression(conditions[condition_index]), mining_rows, testing_rows, target, full_mining_rows.length, full_testing_rows.length));
+    }
+
+    return out;
+  }
+
+  base_condition_funnel_row(label, expression, mining_rows, testing_rows, target, full_mining_count, full_testing_count) {
+    return {
+      label: label,
+      expression: expression,
+      training_rows: mining_rows.length,
+      testing_rows: testing_rows.length,
+      training_row_coverage_pct: this.percent(mining_rows.length, full_mining_count),
+      testing_row_coverage_pct: this.percent(testing_rows.length, full_testing_count),
+      targets: this.baseline_results(mining_rows, testing_rows, target)
+    };
+  }
+
+  filter_rows_by_condition(rows, condition) {
+    var output = [];
+    for (var index = 0; index < rows.length; index += 1) {
+      if (this.matches(rows[index], condition)) output.push(rows[index]);
+    }
+    return output;
+  }
+
+  condition_expression(condition) {
+    if (condition.expression) return condition.expression;
+    if (condition.type === "relative_pair_compare") return condition.left_column + " " + condition.operator + " " + condition.right_column;
+    if (condition.type === "threshold_compare") return condition.column + " " + condition.operator + " " + condition.right_value;
+    if (condition.type === "range" || condition.type === "avoid_range") return condition.column + " between " + condition.min_value + " and " + condition.max_value;
+    return "";
+  }
+
+  baseline_results(mining_rows, testing_rows, target) {
+    var out = [];
+    for (var period_index = 0; period_index < target.periods.length; period_index += 1) {
+      var target_period = target.periods[period_index];
+      var target_column = target.output_prefix + "_" + target_period + "_day";
+      for (var threshold_index = 0; threshold_index < target.thresholds_pct.length; threshold_index += 1) {
+        var threshold = target.thresholds_pct[threshold_index];
+        var training = this.baseline_score(mining_rows, target_column, threshold);
+        var testing = this.baseline_score(testing_rows, target_column, threshold);
+        out.push({
+          target_period: target_period,
+          target_threshold_pct: threshold,
+          training_density_pct: training.density_pct,
+          testing_density_pct: testing.density_pct,
+          training_coverage_pct: 100,
+          testing_coverage_pct: 100,
+          training_rows: training.rows,
+          testing_rows: testing.rows,
+          training_hits: training.hits,
+          testing_hits: testing.hits
+        });
+      }
+    }
+    return out;
+  }
+
+  baseline_score(rows, target_column, threshold) {
+    var valid_rows = 0;
+    var hits = 0;
+    for (var index = 0; index < rows.length; index += 1) {
+      var target_value = rows[index][target_column];
+      if (target_value === null || target_value === undefined) continue;
+      valid_rows += 1;
+      if (Number(target_value) >= Number(threshold)) hits += 1;
+    }
+    return { rows: valid_rows, hits: hits, density_pct: this.percent(hits, valid_rows) };
   }
 
   mine_role(role, mining_rows, testing_rows, target) {
@@ -153,7 +262,10 @@ class ohlcv_role_miner {
       var target_column = target.output_prefix + "_" + target_period + "_day";
       for (var threshold_index = 0; threshold_index < target.thresholds_pct.length; threshold_index += 1) {
         var threshold = target.thresholds_pct[threshold_index];
-        if (instruction.type === "range" || instruction.type === "avoid_range") {
+        if (instruction.type === "threshold_compare") {
+          var thresholds = this.threshold_results(group, instruction, mining_rows, testing_rows, target_column, target_period, threshold);
+          for (var threshold_result_index = 0; threshold_result_index < thresholds.length; threshold_result_index += 1) out.push(thresholds[threshold_result_index]);
+        } else if (instruction.type === "range" || instruction.type === "avoid_range") {
           var ranges = this.range_results(group, instruction, mining_rows, testing_rows, target_column, target_period, threshold);
           for (var range_index = 0; range_index < ranges.length; range_index += 1) out.push(ranges[range_index]);
         } else {
@@ -162,6 +274,44 @@ class ohlcv_role_miner {
       }
     }
     return out;
+  }
+
+  threshold_results(group, instruction, mining_rows, testing_rows, target_column, target_period, threshold) {
+    var values = this.threshold_values(instruction, mining_rows, target_column);
+    var out = [];
+    for (var value_index = 0; value_index < values.length; value_index += 1) {
+      var threshold_instruction = {
+        type: instruction.type,
+        column: instruction.column,
+        operator: instruction.operator,
+        right_value: values[value_index],
+        expression: instruction.column + " " + instruction.operator + " " + values[value_index]
+      };
+      out.push(this.result(group, threshold_instruction, target_period, threshold, this.score(mining_rows, threshold_instruction, target_column, threshold), this.score(testing_rows, threshold_instruction, target_column, threshold)));
+    }
+    return out;
+  }
+
+  threshold_values(instruction, mining_rows, target_column) {
+    var values = [];
+    var seen = {};
+    this.add_candidate_values(values, seen, instruction.candidate_values || []);
+    if (instruction.derive_from_data) {
+      this.add_candidate_values(values, seen, this.cutpoints(this.sorted_values(mining_rows, instruction.column, target_column), instruction.percentile_cutpoints || []));
+    }
+    values.sort(function compare(left, right) { return Number(left) - Number(right); });
+    return values;
+  }
+
+  add_candidate_values(values, seen, candidates) {
+    for (var index = 0; index < candidates.length; index += 1) {
+      var value = Number(candidates[index]);
+      if (!Number.isFinite(value)) continue;
+      value = Math.round(value * 100) / 100;
+      if (seen[String(value)]) continue;
+      seen[String(value)] = true;
+      values.push(value);
+    }
   }
 
   range_results(group, instruction, mining_rows, testing_rows, target_column, target_period, threshold) {
@@ -209,7 +359,14 @@ class ohlcv_role_miner {
   }
 
   result(group, instruction, target_period, threshold, training, testing) {
-    return { role: group.role, family: group.family, condition_type: instruction.type, expression: instruction.expression, target_period: target_period, target_threshold_pct: threshold, training_density_pct: training.density_pct, testing_density_pct: testing.density_pct, training_coverage_pct: training.coverage_pct, testing_coverage_pct: testing.coverage_pct, training_matches: training.matches, testing_matches: testing.matches, training_hits: training.hits, testing_hits: testing.hits };
+    return { role: group.role, family: group.family, condition_type: instruction.type, expression: instruction.expression, instruction: this.clone_instruction(instruction), target_period: target_period, target_threshold_pct: threshold, training_density_pct: training.density_pct, testing_density_pct: testing.density_pct, training_coverage_pct: training.coverage_pct, testing_coverage_pct: testing.coverage_pct, training_matches: training.matches, testing_matches: testing.matches, training_hits: training.hits, testing_hits: testing.hits };
+  }
+
+  clone_instruction(instruction) {
+    var out = {};
+    var keys = Object.keys(instruction || {});
+    for (var index = 0; index < keys.length; index += 1) out[keys[index]] = instruction[keys[index]];
+    return out;
   }
 
   rank(results, ranking) {
@@ -220,13 +377,13 @@ class ohlcv_role_miner {
       out.push(results[index]);
     }
     out.sort(function compare(left, right) {
-      if (right.testing_density_pct !== left.testing_density_pct) return right.testing_density_pct - left.testing_density_pct;
-      return right.testing_coverage_pct - left.testing_coverage_pct;
+      if (right.training_density_pct !== left.training_density_pct) return right.training_density_pct - left.training_density_pct;
+      return right.training_coverage_pct - left.training_coverage_pct;
     });
     return out.slice(0, Number(ranking.top_n));
   }
 
-  flatten(collection) {
+  flatten_without_base_conditions(collection) {
     var out = [];
     var stocks = Object.keys(collection || {});
     for (var stock_index = 0; stock_index < stocks.length; stock_index += 1) {
@@ -234,6 +391,32 @@ class ohlcv_role_miner {
       for (var row_index = 0; row_index < rows.length; row_index += 1) if (rows[row_index].__exclude_from_mining !== true) out.push(rows[row_index]);
     }
     return out;
+  }
+
+  flatten(collection) {
+    return this.apply_base_conditions(this.flatten_without_base_conditions(collection));
+  }
+
+  apply_base_conditions(rows) {
+    var out = [];
+    for (var index = 0; index < rows.length; index += 1) if (this.row_passes_base_conditions(rows[index])) out.push(rows[index]);
+    return out;
+  }
+
+  row_passes_base_conditions(row) {
+    var base = this.config.base_conditions || {};
+    if (!base.enabled) return true;
+    return this.conditions_pass(row, base.conditions || [], base.operator || "AND");
+  }
+
+  conditions_pass(row, conditions, operator) {
+    if (!conditions || conditions.length === 0) return operator === "AND";
+    for (var index = 0; index < conditions.length; index += 1) {
+      var passed = this.matches(row, conditions[index]);
+      if (operator === "AND" && !passed) return false;
+      if (operator === "OR" && passed) return true;
+    }
+    return operator === "AND";
   }
 
   sorted_values(rows, column, target_column) {
@@ -266,13 +449,120 @@ class ohlcv_role_miner {
 
 class ohlcv_condition_selector {
   constructor(config) { this.config = config; }
-  select(mining_report) {
+  select(mining_report, mining_collection) {
     var selected = { regime: [], setup: [], trigger: [], quality: [], risk_avoid: [] };
+    var rows = this.flatten(mining_collection);
+    var minimum_rows = Number(this.config.selected_conditions.minimum_rows_after_adding_condition);
+    if (!Number.isFinite(minimum_rows) || minimum_rows < 1) minimum_rows = 25;
+
     for (var role_index = 0; role_index < mining_report.roles.length; role_index += 1) {
       var role = mining_report.roles[role_index];
-      if (role.results.length > 0 && selected[role.role]) selected[role.role].push(role.results[0]);
+      if (!selected[role.role]) continue;
+
+      for (var result_index = 0; result_index < role.results.length; result_index += 1) {
+        var candidate = role.results[result_index];
+        var trial = this.clone_selected(selected);
+        trial[role.role].push(candidate);
+
+        if (this.count_matching_rows(rows, trial) >= minimum_rows) {
+          selected[role.role].push(candidate);
+          break;
+        }
+      }
     }
+
     return selected;
+  }
+
+  count_matching_rows(rows, selected) {
+    var count = 0;
+
+    for (var row_index = 0; row_index < rows.length; row_index += 1) {
+      if (this.row_passes_selected(rows[row_index], selected)) {
+        count += 1;
+      }
+    }
+
+    return count;
+  }
+
+  row_passes_selected(row, selected) {
+    if (!this.row_passes_base_conditions(row)) return false;
+    if (!this.conditions_pass(row, selected.regime, "AND")) return false;
+    if (!this.conditions_pass(row, selected.setup, "AND")) return false;
+    if (!this.conditions_pass(row, selected.trigger, "AND")) return false;
+    if (!this.conditions_pass(row, selected.quality, "AND")) return false;
+    if (this.conditions_pass(row, selected.risk_avoid, "OR")) return false;
+    return true;
+  }
+
+  conditions_pass(row, conditions, operator) {
+    if (!conditions || conditions.length === 0) return operator === "AND";
+
+    for (var index = 0; index < conditions.length; index += 1) {
+      var passed = this.row_matches_condition(row, conditions[index]);
+
+      if (operator === "AND" && !passed) return false;
+      if (operator === "OR" && passed) return true;
+    }
+
+    return operator === "AND";
+  }
+
+  row_matches_condition(row, condition) {
+    var instruction = condition.instruction || condition;
+    if (instruction.type === "threshold_compare") return this.compare(row[instruction.column], instruction.operator, instruction.right_value);
+    if (instruction.type === "relative_pair_compare") return this.compare(row[instruction.left_column], instruction.operator, row[instruction.right_column]);
+    if (instruction.type === "range" || instruction.type === "avoid_range") return this.value_between(row[instruction.column], Number(instruction.min_value), Number(instruction.max_value));
+    return false;
+  }
+
+  value_between(value, min_value, max_value) {
+    if (value === null || value === undefined) return false;
+    value = Number(value);
+    return Number.isFinite(value) && value >= min_value && value <= max_value;
+  }
+
+  compare(left, operator, right) {
+    if (left === null || left === undefined || right === null || right === undefined) return false;
+    left = Number(left);
+    right = Number(right);
+    if (!Number.isFinite(left) || !Number.isFinite(right)) return false;
+    if (operator === ">") return left > right;
+    if (operator === "<") return left < right;
+    if (operator === ">=") return left >= right;
+    if (operator === "<=") return left <= right;
+    return left === right;
+  }
+
+  clone_selected(selected) {
+    return {
+      regime: selected.regime.slice(0),
+      setup: selected.setup.slice(0),
+      trigger: selected.trigger.slice(0),
+      quality: selected.quality.slice(0),
+      risk_avoid: selected.risk_avoid.slice(0)
+    };
+  }
+
+  flatten(collection) {
+    var output = [];
+    var stock_names = Object.keys(collection || {});
+
+    for (var stock_index = 0; stock_index < stock_names.length; stock_index += 1) {
+      var rows = collection[stock_names[stock_index]];
+      for (var row_index = 0; row_index < rows.length; row_index += 1) {
+        if (rows[row_index].__exclude_from_mining !== true && this.row_passes_base_conditions(rows[row_index])) output.push(rows[row_index]);
+      }
+    }
+
+    return output;
+  }
+
+  row_passes_base_conditions(row) {
+    var base = this.config.base_conditions || {};
+    if (!base.enabled) return true;
+    return this.conditions_pass(row, base.conditions || [], base.operator || "AND");
   }
 }
 
