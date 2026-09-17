@@ -51,6 +51,9 @@ class ohlcv_report_writer {
     html += "<section id=\"backtest-report\"><h2>Backtest</h2>";
     html += this.backtest_body_html(result.backtest_report);
     html += "</section>";
+    html += "<section id=\"strategy-optimization-report\"><h2>Strategy Optimization</h2>";
+    html += this.strategy_optimization_html(result.strategy_report);
+    html += "</section>";
     return this.render_template("combined_report.html", "OHLCV Run Report", html);
   }
 
@@ -165,6 +168,24 @@ class ohlcv_report_writer {
     }
     html += "</tbody></table></details>";
     return html;
+  }
+
+  strategy_optimization_html(strategy_report) {
+    if (!strategy_report || !strategy_report.enabled) return "<p>Strategy optimization disabled.</p>";
+    var html = "<p><strong>" + this.escape(strategy_report.strategy_name) + "</strong>: " + this.escape(strategy_report.description || "") + "</p>";
+    html += "<details open><summary>Optimized Strategy Variants</summary><div class=\"table-scroll\"><table class=\"wide-table\"><thead><tr><th>Rank</th><th>Variant</th><th>Parameters</th><th>Training Density %</th><th>Testing Density %</th><th>Training Coverage %</th><th>Testing Coverage %</th><th>Training Matches</th><th>Testing Matches</th><th>Backtest Trades</th><th>Backtest Return %</th><th>Backtest Win Rate %</th><th>Profit Factor</th></tr></thead><tbody>";
+    for (var index = 0; index < strategy_report.variants.length; index += 1) {
+      var variant = strategy_report.variants[index];
+      var metrics = variant.backtest_metrics || {};
+      html += "<tr><td class=\"number\">" + (index + 1) + "</td><td>" + this.escape(variant.name) + "</td><td class=\"expression\">" + this.escape(this.parameter_text(variant.parameters)) + "</td><td class=\"number\">" + this.format(variant.training_density_pct) + "</td><td class=\"number\">" + this.format(variant.testing_density_pct) + "</td><td class=\"number\">" + this.format(variant.training_coverage_pct) + "</td><td class=\"number\">" + this.format(variant.testing_coverage_pct) + "</td><td class=\"number\">" + this.format_count(variant.training_matches) + "</td><td class=\"number\">" + this.format_count(variant.testing_matches) + "</td><td class=\"number\">" + this.format(metrics.total_trades) + "</td><td class=\"number\">" + this.format(metrics.total_return_pct) + "</td><td class=\"number\">" + this.format(metrics.win_rate_pct) + "</td><td class=\"number\">" + this.format(metrics.profit_factor) + "</td></tr>";
+    }
+    html += "</tbody></table></div></details>";
+    return html;
+  }
+
+  parameter_text(parameters) {
+    if (!parameters) return "";
+    return "pullback=" + parameters.pullback_column + " [" + parameters.pullback_min + ", " + parameters.pullback_max + "], trigger daily return > " + parameters.trigger_daily_return_gt + ", max close vs SMA21=" + parameters.max_close_vs_sma21;
   }
 
   selected_conditions_html(selected_conditions) {

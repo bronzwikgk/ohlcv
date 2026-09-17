@@ -5,6 +5,7 @@ const config_module = require("./ohlcv_project_config");
 const data_module = require("./ohlcv_data");
 const condition_module = require("./ohlcv_conditions");
 const backtesting_module = require("./ohlcv_backtesting");
+const strategy_module = require("./ohlcv_strategy");
 
 function clone(value) {
   return JSON.parse(JSON.stringify(value));
@@ -246,6 +247,51 @@ function test_backtester_strategy_recipes_ablate_roles() {
   assert.strictEqual(report.recipe_reports[1].metrics.total_trades, 0);
 }
 
+function test_strategy_optimizer_builds_concept_variants() {
+  var config = clone(config_module.ohlcv_project_config);
+  config.base_conditions = { enabled: false, operator: "AND", conditions: [] };
+  config.strategies.definitions.sma_pullback_continuation.parameter_grid = {
+    pullback_columns: ["adj_close_vs_sma_pct_3_day"],
+    pullback_ranges: [[-3, 3]],
+    trigger_daily_return_gt: [0],
+    max_close_vs_sma21: [8]
+  };
+  config.strategies.definitions.sma_pullback_continuation.minimum_training_matches = 1;
+  config.strategies.definitions.sma_pullback_continuation.top_n = 5;
+  config.strategies.definitions.sma_pullback_continuation.backtest_top_n = 1;
+  config.backtesting.execution.slippage.enabled = false;
+  config.backtesting.execution.broker_fees.enabled = false;
+  config.backtesting.execution.taxes.enabled = false;
+
+  var row = {
+    date: new Date("2023-01-02"),
+    adj_close: 100,
+    adj_close_sma_21_day: 99,
+    adj_close_sma_55_day: 90,
+    adj_close_sma_slope_pct_55_day: 0.5,
+    adj_close_vs_sma_pct_3_day: 1,
+    adj_close_vs_sma_pct_21_day: 4,
+    adj_close_daily_return_pct: 1,
+    target_adj_close_future_return_pct_1_day: 4
+  };
+  var next_row = {
+    date: new Date("2023-01-03"),
+    adj_close: 104,
+    adj_close_sma_21_day: 99,
+    adj_close_sma_55_day: 90,
+    adj_close_sma_slope_pct_55_day: 0.5,
+    adj_close_vs_sma_pct_3_day: 1,
+    adj_close_vs_sma_pct_21_day: 4,
+    adj_close_daily_return_pct: 1,
+    target_adj_close_future_return_pct_1_day: null
+  };
+  var report = new strategy_module.ohlcv_strategy_optimizer(config).run({ TEST: [row, next_row] }, { TEST: [row, next_row] });
+  assert.strictEqual(report.enabled, true);
+  assert.strictEqual(report.variants.length, 1);
+  assert.strictEqual(report.variants[0].training_matches, 1);
+  assert.strictEqual(report.variants[0].training_density_pct, 100);
+}
+
 test_active_roles_and_mining_targets();
 test_loaded_month_span_is_inclusive();
 test_rank_uses_training_metrics();
@@ -257,5 +303,6 @@ test_structured_condition_matching();
 test_backtester_next_row_entry_and_costs();
 test_backtester_applies_base_conditions();
 test_backtester_strategy_recipes_ablate_roles();
+test_strategy_optimizer_builds_concept_variants();
 
 console.log("ohlcv tests passed");

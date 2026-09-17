@@ -5,7 +5,7 @@ var ohlcv_project_config = {
     name: "ohlcv_role_based_signal_mining",
     version: "v0.1_config_first",
     objective: "Mine role-based short-term trading conditions, validate on held-out stocks, then pass selected rules into backtesting.",
-    default_run_mode: "mine",
+    default_run_mode: "strategy_optimize",
     active_roles: ["regime", "setup", "trigger", "quality", "risk_avoid"],
     notes: [
       "Keep config as the single source of truth.",
@@ -83,6 +83,27 @@ var ohlcv_project_config = {
       }
     ],
     rationale: "Mandatory universe filter applied before mining, selection, and backtesting."
+  },
+
+  strategies: {
+    enabled: true,
+    active_strategy: "sma_pullback_continuation",
+    definitions: {
+      sma_pullback_continuation: {
+        enabled: true,
+        description: "Short-term swing concept: trade stocks in an SMA uptrend after a controlled pullback, entering when short-term momentum resumes.",
+        minimum_training_matches: 100,
+        top_n: 20,
+        backtest_variants: false,
+        backtest_top_n: 3,
+        parameter_grid: {
+          pullback_columns: ["adj_close_vs_sma_pct_3_day", "adj_close_vs_sma_pct_5_day", "adj_close_vs_sma_pct_13_day"],
+          pullback_ranges: [[-6, 2], [-3, 3], [0, 6], [2, 10]],
+          trigger_daily_return_gt: [0, 1, 2],
+          max_close_vs_sma21: [8, 12, 16]
+        }
+      }
+    }
   },
 
   anomaly_cleaning: {
@@ -375,10 +396,7 @@ var ohlcv_project_config = {
     strategy_recipes: [
       { name: "base_only", roles: [] },
       { name: "base_plus_regime", roles: ["regime"] },
-      { name: "base_plus_regime_setup", roles: ["regime", "setup"] },
-      { name: "base_plus_regime_trigger", roles: ["regime", "trigger"] },
       { name: "base_plus_regime_setup_trigger", roles: ["regime", "setup", "trigger"] },
-      { name: "base_plus_regime_setup_trigger_quality", roles: ["regime", "setup", "trigger", "quality"] },
       { name: "full_stack", roles: ["regime", "setup", "trigger", "quality", "risk_avoid"] }
     ],
     execution: {
