@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Role Mining Report</title>
+  <style>body {
+  background: #f7f7f7;
+  color: #222;
+  font-family: Arial, sans-serif;
+  margin: 24px;
+}
+
+details {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  margin: 12px 0;
+  overflow-x: auto;
+}
+
+summary {
+  background: #eee;
+  font-weight: bold;
+  left: 0;
+  padding: 12px;
+  position: sticky;
+}
+
+table {
+  background: #fff;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+td,
+th {
+  border-top: 1px solid #e5e5e5;
+  padding: 8px 10px;
+  text-align: left;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  width: 100%;
+}
+
+table.wide-table {
+  min-width: 900px;
+  width: 100%;
+}
+
+table.compact-table {
+  margin: 0 12px 12px 12px;
+  min-width: 520px;
+  width: max-content;
+}
+
+table.metric-table {
+  margin: 0 12px 12px 12px;
+  min-width: 320px;
+  width: max-content;
+}
+
+table.metric-table td:first-child {
+  min-width: 190px;
+}
+
+table.metric-table td:last-child {
+  min-width: 110px;
+}
+
+.number {
+  text-align: right;
+}
+
+.expression {
+  font-family: Consolas, monospace;
+  font-size: 12px;
+  max-width: 520px;
+  min-width: 220px;
+  white-space: normal;
+}
+
+.condition-list {
+  display: grid;
+  gap: 8px;
+  min-width: 260px;
+}
+
+.condition-values {
+  color: #555;
+  font-size: 12px;
+  margin-top: 3px;
+}
+</style>
+</head>
+<body>
+  <h1>Role Mining Report</h1>
+  <p>Stocks loaded: 134 | Full mining rows: 99729 | Base-filtered mining rows: 49776 | Full testing rows: 66673 | Base-filtered testing rows: 35480</p><details open><summary>Base Condition Funnel</summary><table class="compact-table"><thead><tr><th>Step</th><th>Condition</th><th>Training Rows</th><th>Testing Rows</th><th>Training Row Coverage %</th><th>Testing Row Coverage %</th><th>Training Target Density %</th><th>Testing Target Density %</th><th>Training Hits / Rows</th><th>Testing Hits / Rows</th></tr></thead><tbody><tr><td>Full data after anomaly filters</td><td class="expression"></td><td class="number">99729</td><td class="number">66673</td><td class="number">100.00</td><td class="number">100.00</td><td class="number">26.66</td><td class="number">25.04</td><td class="number">26590 / 99728</td><td class="number">16530 / 66006</td></tr><tr><td>After base 1</td><td class="expression">adj_close &gt; adj_close_sma_21_day</td><td class="number">49776</td><td class="number">35480</td><td class="number">49.91</td><td class="number">53.21</td><td class="number">27.00</td><td class="number">25.85</td><td class="number">13440 / 49776</td><td class="number">9055 / 35023</td></tr></tbody></table></details><details open><summary>Baseline Target Metrics</summary><table class="compact-table"><thead><tr><th>Target</th><th>Training Density %</th><th>Testing Density %</th><th>Training Coverage %</th><th>Testing Coverage %</th><th>Training Hits / Rows</th><th>Testing Hits / Rows</th></tr></thead><tbody><tr><td>5 day &gt;= 3%</td><td class="number">27.00</td><td class="number">25.85</td><td class="number">100.00</td><td class="number">100.00</td><td class="number">13440 / 49776</td><td class="number">9055 / 35023</td></tr></tbody></table></details><details open><summary>Anomaly Cleaning</summary><table class="metric-table"><tbody><tr><td>Mining anomaly rows</td><td class="number">22</td></tr><tr><td>Mining excluded rows</td><td class="number">168</td></tr><tr><td>Testing anomaly rows</td><td class="number">2</td></tr><tr><td>Testing excluded rows</td><td class="number">16</td></tr></tbody></table></details><details open><summary>regime</summary><div class="table-scroll"><table class="wide-table"><thead><tr><th>Rank</th><th>Testing Density %</th><th>Testing Coverage %</th><th>Training Density %</th><th>Training Coverage %</th><th>Family</th><th>Type</th><th>Expression</th></tr></thead><tbody><tr><td class="number">1</td><td class="number">35.83</td><td class="number">4.69</td><td class="number">35.28</td><td class="number">6.42</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_55_day &gt; 0.88</td></tr><tr><td class="number">2</td><td class="number">36.22</td><td class="number">5.50</td><td class="number">33.47</td><td class="number">6.03</td><td>sma_trend_stack_gap_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_vs_sma_pct_21_day_vs_55_day &gt; 15.85</td></tr><tr><td class="number">3</td><td class="number">33.36</td><td class="number">10.17</td><td class="number">33.29</td><td class="number">12.17</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_55_day &gt; 0.67</td></tr><tr><td class="number">4</td><td class="number">35.27</td><td class="number">10.58</td><td class="number">31.68</td><td class="number">11.43</td><td>sma_trend_stack_gap_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_vs_sma_pct_21_day_vs_55_day &gt; 11.93</td></tr><tr><td class="number">5</td><td class="number">32.26</td><td class="number">20.12</td><td class="number">31.55</td><td class="number">22.60</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_55_day &gt; 0.48</td></tr><tr><td class="number">6</td><td class="number">30.71</td><td class="number">30.68</td><td class="number">30.47</td><td class="number">32.86</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_55_day &gt; 0.35</td></tr><tr><td class="number">7</td><td class="number">31.61</td><td class="number">20.60</td><td class="number">30.20</td><td class="number">21.79</td><td>sma_trend_stack_gap_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_vs_sma_pct_21_day_vs_55_day &gt; 8.12</td></tr><tr><td class="number">8</td><td class="number">32.97</td><td class="number">3.64</td><td class="number">29.30</td><td class="number">5.40</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_21_day &gt; 1.43</td></tr><tr><td class="number">9</td><td class="number">33.30</td><td class="number">8.01</td><td class="number">29.10</td><td class="number">10.73</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_21_day &gt; 1.11</td></tr><tr><td class="number">10</td><td class="number">29.46</td><td class="number">42.04</td><td class="number">29.08</td><td class="number">42.13</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_55_day &gt; 0.25</td></tr><tr><td class="number">11</td><td class="number">29.81</td><td class="number">30.43</td><td class="number">29.05</td><td class="number">31.43</td><td>sma_trend_stack_gap_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_vs_sma_pct_21_day_vs_55_day &gt; 5.85</td></tr><tr><td class="number">12</td><td class="number">31.19</td><td class="number">17.38</td><td class="number">28.91</td><td class="number">21.61</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_21_day &gt; 0.78</td></tr><tr><td class="number">13</td><td class="number">29.92</td><td class="number">27.23</td><td class="number">28.70</td><td class="number">31.97</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_21_day &gt; 0.6</td></tr><tr><td class="number">14</td><td class="number">29.06</td><td class="number">37.28</td><td class="number">28.25</td><td class="number">41.53</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_21_day &gt; 0.47</td></tr><tr><td class="number">15</td><td class="number">28.07</td><td class="number">51.81</td><td class="number">28.07</td><td class="number">51.09</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_55_day &gt; 0.17</td></tr><tr><td class="number">16</td><td class="number">28.19</td><td class="number">40.53</td><td class="number">28.04</td><td class="number">40.45</td><td>sma_trend_stack_gap_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_vs_sma_pct_21_day_vs_55_day &gt; 4</td></tr><tr><td class="number">17</td><td class="number">28.60</td><td class="number">49.75</td><td class="number">28.03</td><td class="number">51.96</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_21_day &gt; 0.35</td></tr><tr><td class="number">18</td><td class="number">27.35</td><td class="number">59.98</td><td class="number">27.73</td><td class="number">61.76</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_21_day &gt; 0.25</td></tr><tr><td class="number">19</td><td class="number">27.08</td><td class="number">62.36</td><td class="number">27.42</td><td class="number">59.02</td><td>sma_momentum_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_slope_pct_55_day &gt; 0.09</td></tr><tr><td class="number">20</td><td class="number">27.09</td><td class="number">51.12</td><td class="number">27.40</td><td class="number">49.44</td><td>sma_trend_stack_gap_pct</td><td>threshold_compare</td><td class="expression">adj_close_sma_vs_sma_pct_21_day_vs_55_day &gt; 2.31</td></tr></tbody></table></div></details>
+</body>
+</html>
