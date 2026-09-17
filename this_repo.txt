@@ -1,0 +1,1 @@
+This repo contains work in progress work for OHLCV, condition, rule, strategy mining.
