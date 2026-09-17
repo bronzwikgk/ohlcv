@@ -54,7 +54,7 @@ class ohlcv_report_writer {
     html += "<section id=\"backtest-report\"><h2>Backtest</h2>";
     html += this.backtest_body_html(result.backtest_report);
     html += "</section>";
-    return this.render_template("combined_report.html", "OHLCV Run Report", html);
+    return this.render_template("combined_report.html", this.config.reporting.reports.combined.title || "OHLCV Run Report", html);
   }
 
   mining_body_html(result) {

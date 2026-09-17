@@ -478,9 +478,9 @@ var ohlcv_project_config = {
     reports: {
       combined: {
         enabled: true,
-        file_prefix: "ohlcv_run_report",
+        file_prefix: "strategy_pullback_report",
         file_extension: "html",
-        title: "OHLCV Run Report"
+        title: "SMA Pullback Strategy Report"
       },
       mining: {
         enabled: false,

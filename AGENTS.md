@@ -90,8 +90,8 @@ Use one combined report per run, not separate mining/backtest reports.
 Current output format:
 
 ```text
-output/ohlcv_run_report_###.html
-output/ohlcv_run_report_latest.html
+output/strategy_pullback_report_###.html
+output/strategy_pullback_report_latest.html
 ```
 
 Report templates live in:
