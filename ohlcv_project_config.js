@@ -65,7 +65,7 @@ var ohlcv_project_config = {
     type: "future_return_pct",
     input_column: "adj_close",
     output_prefix: "target_adj_close_future_return_pct",
-    periods: [5],
+    periods: [1, 3, 5, 8],
     thresholds_pct: [3],
     role_usage: ["all_mining_roles", "backtest_evaluation"]
   },
