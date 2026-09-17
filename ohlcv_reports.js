@@ -216,7 +216,7 @@ class ohlcv_report_writer {
 
   anomaly_html(report) {
     if (!report) return "";
-    return "<details open><summary>Anomaly Cleaning</summary><table class=\"metric-table\"><tbody><tr><td>Mining anomaly rows</td><td class=\"number\">" + report.mining.anomaly_rows + "</td></tr><tr><td>Mining excluded rows</td><td class=\"number\">" + report.mining.rows_excluded_from_mining + "</td></tr><tr><td>Testing anomaly rows</td><td class=\"number\">" + report.testing.anomaly_rows + "</td></tr><tr><td>Testing excluded rows</td><td class=\"number\">" + report.testing.rows_excluded_from_mining + "</td></tr></tbody></table></details>";
+    return "<details open><summary>Anomaly Cleaning</summary><table class=\"compact-table\"><thead><tr><th>Mining Anomaly Rows</th><th>Mining Excluded Rows</th><th>Testing Anomaly Rows</th><th>Testing Excluded Rows</th></tr></thead><tbody><tr><td class=\"number\">" + report.mining.anomaly_rows + "</td><td class=\"number\">" + report.mining.rows_excluded_from_mining + "</td><td class=\"number\">" + report.testing.anomaly_rows + "</td><td class=\"number\">" + report.testing.rows_excluded_from_mining + "</td></tr></tbody></table></details>";
   }
 
   role_derivatives_html(built_condition_groups, role_name) {
