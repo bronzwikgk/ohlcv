@@ -29,7 +29,7 @@ var ohlcv_project_config = {
     enabled: true,
     source_dir: "D:\\0dot1_Aug_2016_master\\data\\mstock_mtf_daily_data",
     file_pattern: ".csv",
-    number_of_stocks_to_load: 250,
+    number_of_stocks_to_load: 5,
     number_of_years_of_data: 6,
     seed: 21,
     window_end_date: "2023-12-31",
