@@ -113,7 +113,7 @@ var ohlcv_project_config = {
         owner: "feature_registry",
         input_column: "adj_close",
         output_prefix: "adj_close_sma",
-        lookbacks: [5, 13, 21, 55],
+        lookbacks: [3, 5, 13, 21, 55],
         description: "Simple moving average of adjusted close."
       }
     ],
@@ -128,7 +128,7 @@ var ohlcv_project_config = {
         right_family: "sma",
         right_output_prefix: "adj_close_sma",
         output_prefix: "adj_close_vs_sma_pct",
-        lookbacks: [5, 13, 21, 55],
+        lookbacks: [3, 5, 13, 21, 55],
         primary_roles: ["setup", "trigger", "risk_avoid"],
         description: "Close distance from SMA. Helps identify pullback, breakout, and over-extension."
       },
@@ -142,6 +142,8 @@ var ohlcv_project_config = {
         output_prefix: "adj_close_sma_vs_sma_pct",
         comparison_pairs: [
           { left_lookback: 5, right_lookback: 13 },
+          { left_lookback: 3, right_lookback: 5 },
+          { left_lookback: 3, right_lookback: 13 },
           { left_lookback: 5, right_lookback: 21 },
           { left_lookback: 13, right_lookback: 21 },
           { left_lookback: 13, right_lookback: 55 },
@@ -173,7 +175,7 @@ var ohlcv_project_config = {
         type: "slope_pct",
         input_output_prefix: "adj_close_sma",
         output_prefix: "adj_close_sma_slope_pct",
-        lookbacks: [5, 13, 21, 55],
+        lookbacks: [3, 5, 13, 21, 55],
         slope_periods: [1],
         primary_roles: ["regime", "trigger", "quality"],
         description: "One-row SMA slope. Captures trend direction and recent trend momentum."
@@ -188,6 +190,8 @@ var ohlcv_project_config = {
         output_prefix: "adj_close_sma_slope_vs_slope_pct",
         comparison_pairs: [
           { left_lookback: 5, right_lookback: 13 },
+          { left_lookback: 3, right_lookback: 5 },
+          { left_lookback: 3, right_lookback: 13 },
           { left_lookback: 5, right_lookback: 21 },
           { left_lookback: 13, right_lookback: 21 },
           { left_lookback: 21, right_lookback: 55 }
@@ -216,7 +220,7 @@ var ohlcv_project_config = {
       purpose: "Pre-entry price structure inside selected regime.",
       run_inside_roles: ["regime"],
       allowed_families: ["price_distance_from_sma_pct", "sma_trend_stack_gap_pct"],
-      allowed_lookbacks: [13, 21, 55],
+      allowed_lookbacks: [3, 5, 13, 21, 55],
       allowed_condition_types: ["range"],
       conflict_policy: "range_only_no_threshold_duplication"
     },
@@ -227,7 +231,7 @@ var ohlcv_project_config = {
       purpose: "Actual row-level entry timing.",
       run_inside_roles: ["regime", "setup"],
       allowed_families: ["price_distance_from_sma_pct", "sma_trend_stack_gap_pct", "sma_momentum_pct", "sma_momentum_spread_pct"],
-      allowed_lookbacks: [5, 13, 21],
+      allowed_lookbacks: [3, 5, 13, 21],
       allowed_condition_types: ["threshold_compare", "relative_pair_compare", "range"],
       conflict_policy: "shorter_lookbacks_only_for_entry_timing"
     },
