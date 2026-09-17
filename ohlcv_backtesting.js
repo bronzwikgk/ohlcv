@@ -11,7 +11,7 @@ class ohlcv_backtester {
     }
 
     var full_report = this.run_single(testing_collection, selected_conditions);
-    full_report.recipe_reports = this.run_recipes(testing_collection, selected_conditions);
+    full_report.recipe_reports = this.config.project.default_run_mode === "strategy_optimize" ? [] : this.run_recipes(testing_collection, selected_conditions);
     return full_report;
   }
 

@@ -56,6 +56,7 @@ adj_close > adj_close_sma_21_day
 
 - Threshold conditions should be data-derived from mining data percentiles, while preserving configured anchor values such as `0`.
 - Rank mined rules using training/mining metrics only. Testing metrics are validation/reporting only.
+- In `strategy_optimize` mode, generic role mining is disabled/hidden in the report. Show baseline, base funnel, concept variants, and the backtest for the best concept variant.
 
 ## Roles
 
@@ -142,4 +143,3 @@ git add -A
 git commit -m "<clear message>"
 git push origin wip_dot_ohlcv
 ```
-

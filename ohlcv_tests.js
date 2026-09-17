@@ -214,6 +214,7 @@ function test_backtester_applies_base_conditions() {
 
 function test_backtester_strategy_recipes_ablate_roles() {
   var config = clone(config_module.ohlcv_project_config);
+  config.project.default_run_mode = "mine";
   config.backtesting.initial_capital = 10000;
   config.backtesting.position_sizing.value = 100;
   config.backtesting.risk.maximum_open_positions = 10;

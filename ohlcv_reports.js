@@ -48,11 +48,11 @@ class ohlcv_report_writer {
     var html = "<section id=\"mining-report\"><h2>Mining</h2>";
     html += this.mining_body_html(result);
     html += "</section>";
-    html += "<section id=\"backtest-report\"><h2>Backtest</h2>";
-    html += this.backtest_body_html(result.backtest_report);
-    html += "</section>";
     html += "<section id=\"strategy-optimization-report\"><h2>Strategy Optimization</h2>";
     html += this.strategy_optimization_html(result.strategy_report);
+    html += "</section>";
+    html += "<section id=\"backtest-report\"><h2>Backtest</h2>";
+    html += this.backtest_body_html(result.backtest_report);
     html += "</section>";
     return this.render_template("combined_report.html", "OHLCV Run Report", html);
   }
@@ -63,8 +63,10 @@ class ohlcv_report_writer {
     html += this.baseline_html(result.mining_report.baseline);
     html += this.base_condition_funnel_html(result.mining_report.base_condition_funnel);
     html += this.anomaly_html(result.anomaly_report);
-    html += this.role_derivatives_html(result.built_condition_groups, "regime");
-    html += this.role_results_sections_html(result.mining_report);
+    if (this.config.project.default_run_mode !== "strategy_optimize") {
+      html += this.role_derivatives_html(result.built_condition_groups, "regime");
+      html += this.role_results_sections_html(result.mining_report);
+    }
     return html;
   }
 
