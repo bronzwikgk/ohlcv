@@ -2,6 +2,7 @@
 
 const assert = require("assert");
 const config_module = require("./ohlcv_project_config");
+const data_module = require("./ohlcv_data");
 const condition_module = require("./ohlcv_conditions");
 const backtesting_module = require("./ohlcv_backtesting");
 
@@ -19,6 +20,13 @@ function test_active_roles_and_mining_targets() {
   assert.strictEqual(built.roles[0].role, "regime");
   assert.deepStrictEqual(built.target_returns.periods, [5]);
   assert.deepStrictEqual(built.target_returns.thresholds_pct, [3]);
+}
+
+function test_loaded_month_span_is_inclusive() {
+  var loader = new data_module.ohlcv_data_loader(config_module.ohlcv_project_config);
+  assert.strictEqual(loader.month_span(new Date("2020-01-15"), new Date("2020-01-20")), 1);
+  assert.strictEqual(loader.month_span(new Date("2020-01-15"), new Date("2020-03-01")), 3);
+  assert.strictEqual(loader.month_span(new Date("2020-12-31"), new Date("2021-01-01")), 2);
 }
 
 function test_rank_uses_training_metrics() {
@@ -204,6 +212,7 @@ function test_backtester_applies_base_conditions() {
 }
 
 test_active_roles_and_mining_targets();
+test_loaded_month_span_is_inclusive();
 test_rank_uses_training_metrics();
 test_threshold_values_are_data_derived();
 test_baseline_target_metrics();

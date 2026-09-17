@@ -68,6 +68,9 @@ class ohlcv_data_loader {
       seed: config.data_loading.seed,
       total_number_of_stocks: 0,
       rows_loaded: 0,
+      loaded_start_date: null,
+      loaded_end_date: null,
+      loaded_total_months: 0,
       source_files_selected: 0,
       selected_stock_names: [],
       loaded_stock_names: [],
@@ -95,9 +98,27 @@ class ohlcv_data_loader {
       this.report.loaded_stock_names.push(stock_name);
       this.report.total_number_of_stocks += 1;
       this.report.rows_loaded += rows.length;
+      this.update_loaded_date_window(rows);
     }
 
     return output;
+  }
+
+  update_loaded_date_window(rows) {
+    for (var index = 0; index < rows.length; index += 1) {
+      var date = rows[index].date;
+      if (!(date instanceof Date) || Number.isNaN(date.getTime())) continue;
+      if (this.report.loaded_start_date === null || date < this.report.loaded_start_date) this.report.loaded_start_date = date;
+      if (this.report.loaded_end_date === null || date > this.report.loaded_end_date) this.report.loaded_end_date = date;
+    }
+
+    this.report.loaded_total_months = this.month_span(this.report.loaded_start_date, this.report.loaded_end_date);
+  }
+
+  month_span(start_date, end_date) {
+    if (!(start_date instanceof Date) || !(end_date instanceof Date)) return 0;
+    if (Number.isNaN(start_date.getTime()) || Number.isNaN(end_date.getTime())) return 0;
+    return ((end_date.getFullYear() - start_date.getFullYear()) * 12) + (end_date.getMonth() - start_date.getMonth()) + 1;
   }
 
   scan_files() {

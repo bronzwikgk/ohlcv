@@ -56,7 +56,7 @@ class ohlcv_report_writer {
 
   mining_body_html(result) {
     var html = "";
-    html += "<p>Stocks loaded: " + result.loaded_report.total_number_of_stocks + " | Full mining rows: " + this.format_count(result.mining_report.full_mining_row_count) + " | Base-filtered mining rows: " + result.mining_report.mining_row_count + " | Full testing rows: " + this.format_count(result.mining_report.full_testing_row_count) + " | Base-filtered testing rows: " + result.mining_report.testing_row_count + "</p>";
+    html += "<p>Stocks loaded: " + result.loaded_report.total_number_of_stocks + " | Year start: " + this.escape(this.year_text(result.loaded_report.loaded_start_date)) + " | Year end: " + this.escape(this.year_text(result.loaded_report.loaded_end_date)) + " | Loaded months: " + this.format_count(result.loaded_report.loaded_total_months) + " | Full mining rows: " + this.format_count(result.mining_report.full_mining_row_count) + " | Base-filtered mining rows: " + result.mining_report.mining_row_count + " | Full testing rows: " + this.format_count(result.mining_report.full_testing_row_count) + " | Base-filtered testing rows: " + result.mining_report.testing_row_count + "</p>";
     html += this.baseline_html(result.mining_report.baseline);
     html += this.base_condition_funnel_html(result.mining_report.base_condition_funnel);
     html += this.anomaly_html(result.anomaly_report);
@@ -303,6 +303,13 @@ class ohlcv_report_writer {
   format_count(value) {
     if (value === null || value === undefined) return "";
     return String(value);
+  }
+
+  year_text(value) {
+    if (value === null || value === undefined) return "";
+    var date = value instanceof Date ? value : new Date(value);
+    if (Number.isNaN(date.getTime())) return "";
+    return String(date.getFullYear());
   }
 
   escape(value) {
