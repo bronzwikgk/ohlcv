@@ -142,6 +142,7 @@ class ohlcv_report_writer {
     var keys = Object.keys(report.metrics);
     for (var index = 0; index < keys.length; index += 1) html += "<tr><td>" + this.escape(keys[index]) + "</td><td class=\"number\">" + this.format(report.metrics[keys[index]]) + "</td></tr>";
     html += "</tbody></table>";
+    html += this.strategy_recipes_html(report.recipe_reports);
     html += this.selected_conditions_html(report.selected_conditions);
     html += this.backtest_funnel_html(report.diagnostics);
     html += "<h2>Trades</h2><div class=\"table-scroll\"><table class=\"wide-table\"><thead><tr><th>Stock</th><th>Signal</th><th>Entry</th><th>Exit</th><th>Exit Reason</th><th>PnL %</th><th>Costs</th><th>Net PnL</th><th>Entry Condition Details</th></tr></thead><tbody>";
@@ -150,6 +151,19 @@ class ohlcv_report_writer {
       html += "<tr><td>" + this.escape(trade.stock) + "</td><td>" + this.escape(trade.signal_date || "") + "</td><td>" + this.escape(trade.entry_date) + "</td><td>" + this.escape(trade.exit_date) + "</td><td>" + this.escape(trade.exit_reason || "") + "</td><td class=\"number\">" + this.format(trade.pnl_pct) + "</td><td class=\"number\">" + this.format(trade.costs) + "</td><td class=\"number\">" + this.format(trade.net_pnl) + "</td><td>" + this.trade_condition_details_html(trade.condition_details) + "</td></tr>";
     }
     html += "</tbody></table></div>";
+    return html;
+  }
+
+  strategy_recipes_html(recipe_reports) {
+    if (!recipe_reports || !recipe_reports.length) return "";
+    var html = "<details open id=\"strategy-recipe-comparison\"><summary>Strategy Recipe Comparison</summary><table class=\"compact-table\"><thead><tr><th>Recipe</th><th>Roles</th><th>Entry Rows</th><th>Total Trades</th><th>Total Return %</th><th>Win Rate %</th><th>Profit Factor</th><th>Final Equity</th></tr></thead><tbody>";
+    for (var index = 0; index < recipe_reports.length; index += 1) {
+      var report = recipe_reports[index];
+      var metrics = report.metrics || {};
+      var diagnostics = report.diagnostics || {};
+      html += "<tr><td>" + this.escape(report.name) + "</td><td>" + this.escape(report.roles || "base only") + "</td><td class=\"number\">" + this.format_count(diagnostics.entry_rows) + "</td><td class=\"number\">" + this.format(metrics.total_trades) + "</td><td class=\"number\">" + this.format(metrics.total_return_pct) + "</td><td class=\"number\">" + this.format(metrics.win_rate_pct) + "</td><td class=\"number\">" + this.format(metrics.profit_factor) + "</td><td class=\"number\">" + this.format(metrics.final_equity) + "</td></tr>";
+    }
+    html += "</tbody></table></details>";
     return html;
   }
 

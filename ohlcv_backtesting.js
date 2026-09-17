@@ -7,9 +7,15 @@ class ohlcv_backtester {
 
   run(testing_collection, selected_conditions) {
     if (!this.config.backtesting.enabled) {
-      return { enabled: false, trades: [], metrics: {}, selected_conditions: {}, diagnostics: {} };
+      return { enabled: false, trades: [], metrics: {}, selected_conditions: {}, diagnostics: {}, recipe_reports: [] };
     }
 
+    var full_report = this.run_single(testing_collection, selected_conditions);
+    full_report.recipe_reports = this.run_recipes(testing_collection, selected_conditions);
+    return full_report;
+  }
+
+  run_single(testing_collection, selected_conditions) {
     var trades = [];
     var capital = Number(this.config.backtesting.initial_capital);
     var equity = capital;
@@ -31,6 +37,40 @@ class ohlcv_backtester {
     }
 
     return { enabled: true, trades: trades, metrics: this.metrics(capital, equity, trades), selected_conditions: selected_summary, diagnostics: diagnostics };
+  }
+
+  run_recipes(testing_collection, selected_conditions) {
+    var recipes = this.config.backtesting.strategy_recipes || [];
+    var out = [];
+    for (var recipe_index = 0; recipe_index < recipes.length; recipe_index += 1) {
+      var recipe = recipes[recipe_index];
+      var recipe_selected = this.selected_for_recipe(selected_conditions, recipe);
+      var report = this.run_single(testing_collection, recipe_selected);
+      out.push({
+        name: recipe.name || ("recipe_" + (recipe_index + 1)),
+        roles: (recipe.roles || []).join(" + "),
+        metrics: report.metrics,
+        diagnostics: report.diagnostics,
+        selected_conditions: report.selected_conditions
+      });
+    }
+    return out;
+  }
+
+  selected_for_recipe(selected_conditions, recipe) {
+    var roles = ["regime", "setup", "trigger", "quality", "risk_avoid"];
+    var selected = { regime: [], setup: [], trigger: [], quality: [], risk_avoid: [] };
+    var recipe_roles = recipe.roles || [];
+    for (var role_index = 0; role_index < roles.length; role_index += 1) {
+      var role = roles[role_index];
+      if (this.role_in_recipe(role, recipe_roles)) selected[role] = (selected_conditions[role] || []).slice(0);
+    }
+    return selected;
+  }
+
+  role_in_recipe(role, recipe_roles) {
+    for (var index = 0; index < recipe_roles.length; index += 1) if (recipe_roles[index] === role) return true;
+    return false;
   }
 
   row_passes_strategy(row, selected) {

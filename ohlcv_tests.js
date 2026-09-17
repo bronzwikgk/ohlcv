@@ -211,6 +211,41 @@ function test_backtester_applies_base_conditions() {
   assert.strictEqual(report.trades.length, 0);
 }
 
+function test_backtester_strategy_recipes_ablate_roles() {
+  var config = clone(config_module.ohlcv_project_config);
+  config.backtesting.initial_capital = 10000;
+  config.backtesting.position_sizing.value = 100;
+  config.backtesting.risk.maximum_open_positions = 10;
+  config.backtesting.execution.slippage.enabled = false;
+  config.backtesting.execution.broker_fees.enabled = false;
+  config.backtesting.execution.taxes.enabled = false;
+  config.backtesting.rule_sets.stop_loss_set.fixed_percent_loss.enabled = false;
+  config.backtesting.rule_sets.stop_loss_set.trailing_percent.enabled = false;
+  config.backtesting.rule_sets.stop_loss_set.take_profit.enabled = false;
+  config.backtesting.strategy_recipes = [
+    { name: "regime_only", roles: ["regime"] },
+    { name: "regime_setup", roles: ["regime", "setup"] }
+  ];
+  config.base_conditions = { enabled: false, operator: "AND", conditions: [] };
+
+  var selected = {
+    regime: [{ expression: "signal > 0", instruction: { type: "threshold_compare", column: "signal", operator: ">", right_value: 0 } }],
+    setup: [{ expression: "setup > 0", instruction: { type: "threshold_compare", column: "setup", operator: ">", right_value: 0 } }],
+    trigger: [],
+    quality: [],
+    risk_avoid: []
+  };
+  var rows = [
+    { date: new Date("2023-01-02"), adj_close: 100, signal: 1, setup: -1 },
+    { date: new Date("2023-01-03"), adj_close: 110, signal: 0, setup: -1 },
+    { date: new Date("2023-01-04"), adj_close: 120, signal: 0, setup: -1 }
+  ];
+  var report = new backtesting_module.ohlcv_backtester(config).run({ TEST: rows }, selected);
+  assert.strictEqual(report.recipe_reports.length, 2);
+  assert.strictEqual(report.recipe_reports[0].metrics.total_trades, 1);
+  assert.strictEqual(report.recipe_reports[1].metrics.total_trades, 0);
+}
+
 test_active_roles_and_mining_targets();
 test_loaded_month_span_is_inclusive();
 test_rank_uses_training_metrics();
@@ -221,5 +256,6 @@ test_base_condition_funnel_tracks_full_and_filtered_density();
 test_structured_condition_matching();
 test_backtester_next_row_entry_and_costs();
 test_backtester_applies_base_conditions();
+test_backtester_strategy_recipes_ablate_roles();
 
 console.log("ohlcv tests passed");

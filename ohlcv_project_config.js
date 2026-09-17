@@ -368,6 +368,15 @@ var ohlcv_project_config = {
       max_holding_days: 5,
       day_bar_column: "date"
     },
+    strategy_recipes: [
+      { name: "base_only", roles: [] },
+      { name: "base_plus_regime", roles: ["regime"] },
+      { name: "base_plus_regime_setup", roles: ["regime", "setup"] },
+      { name: "base_plus_regime_trigger", roles: ["regime", "trigger"] },
+      { name: "base_plus_regime_setup_trigger", roles: ["regime", "setup", "trigger"] },
+      { name: "base_plus_regime_setup_trigger_quality", roles: ["regime", "setup", "trigger", "quality"] },
+      { name: "full_stack", roles: ["regime", "setup", "trigger", "quality", "risk_avoid"] }
+    ],
     execution: {
       slippage: {
         enabled: true,
