@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Regime Dashboard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="{{ url_for('static', filename='lightweight-charts.js') }}"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <h1>Dynamic Regime Dashboard</h1>
+        <nav>
+            <select id="stock-select">
+                <option value="">Loading stocks...</option>
+            </select>
+            <button id="load-btn">Load Chart</button>
+        </nav>
+    </header>
+    <main>
+        <article>
+            <header>
+                <h2>Select a stock to calculate dynamic paths</h2>
+            </header>
+            <section id="chart-price"></section>
+            <section id="chart-distance"></section>
+            <section id="chart-efficiency"></section>
+        </article>
+    </main>
+    <footer>
+        <p>Auto-adjusting path length efficiency filter.</p>
+    </footer>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+
+</html>

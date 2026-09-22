@@ -1,0 +1,124 @@
+:root {
+    --bg-dark: #0f172a;
+    --panel-bg: rgba(30, 41, 59, 1);
+    --text-main: #f8fafc;
+    --text-muted: #94a3b8;
+    --primary: #3b82f6;
+    --primary-hover: #2563eb;
+    --border: #334155;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+body > header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 2rem;
+    background: var(--panel-bg);
+    border-bottom: 1px solid var(--border);
+}
+
+body > header > h1 {
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+body > header > nav {
+    display: flex;
+    gap: 1rem;
+}
+
+body > header > nav > select {
+    appearance: none;
+    background-color: var(--bg-dark);
+    border: 1px solid var(--border);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+    cursor: pointer;
+    outline: none;
+}
+
+body > header > nav > select:hover {
+    border-color: var(--primary);
+}
+
+body > header > nav > button {
+    background-color: var(--primary);
+    color: white;
+    border: none;
+    padding: 0.5rem 1.5rem;
+    border-radius: 6px;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+body > header > nav > button:hover {
+    background-color: var(--primary-hover);
+}
+
+body > main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+body > main > article {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+}
+
+body > main > article > header {
+    padding: 1rem 2rem;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+body > main > article > section {
+    width: 100vw;
+    position: relative; /* LW charts absolute positioning */
+}
+
+body > main > article > section:nth-of-type(1) {
+    height: 50vh; /* Price */
+}
+
+body > main > article > section:nth-of-type(2) {
+    height: 20vh; /* Distance */
+    border-top: 1px solid var(--border);
+}
+
+body > main > article > section:nth-of-type(3) {
+    height: 20vh; /* ER */
+    border-top: 1px solid var(--border);
+}
+
+body > footer {
+    padding: 1rem;
+    text-align: center;
+    background: var(--panel-bg);
+    border-top: 1px solid var(--border);
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
