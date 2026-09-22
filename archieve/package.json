@@ -1,0 +1,10 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "node start.js",
+    "miner": "node start.js",
+    "chart": "npm --prefix chart_engine start",
+    "chart:check": "npm --prefix chart_engine run check",
+    "actionchart": "npm --prefix actionChart_derivative start"
+  }
+}

@@ -1,0 +1,1880 @@
+{
+  "enabled": true,
+  "schema_version": "base_entry_mining_schema_v1",
+  "symbol": "JYOTISTRUC",
+  "feature_count": 35,
+  "entry_case_count": 1237,
+  "single_candidate_count": 24,
+  "candidate_count": 1661,
+  "baseline": {
+    "total_count": 1237,
+    "win_count": 255,
+    "loss_count": 982,
+    "win_rate": 0.206143896523848,
+    "win_rate_pct": 20.6143896523848
+  },
+  "base_case_definition": "Base case is selected by useful occurrence: enough recurring wins, win-rate lift over baseline, positive return, not-too-broad match rate, plus dominant exit occurrence.",
+  "top_candidates": [
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C1",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 1,
+      "condition_count": 1,
+      "rule_text": "close_ema_3_daily_range_5_pct >= 5.443470843473113",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_range_5_pct",
+          "operator": ">=",
+          "threshold": 5.443470843473113,
+          "condition": "close_ema_3_daily_range_5_pct >= 5.443470843473113"
+        }
+      ],
+      "matched_count": 619,
+      "win_count": 169,
+      "loss_count": 450,
+      "win_rate": 0.2730210016155089,
+      "win_rate_pct": 27.30210016155089,
+      "total_return_pct": 240.41931683236248,
+      "average_return_pct": 0.38839954254016557,
+      "max_loss_pct": -10.445343498034054,
+      "max_gain_pct": 15.64246482726509,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.5004042037186742,
+      "match_rate_pct": 50.04042037186742,
+      "win_rate_lift_pct": 6.687710509166088,
+      "broadness_penalty": 0,
+      "loss_penalty": 22.5,
+      "base_score": 350.1037511734509,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C1",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C1",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_range_5_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 5.443470843473113,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 427,
+      "strategy_accuracy_pct": 44.26229508196721,
+      "strategy_avg_return_per_annum_pct": 53.01440523320702,
+      "strategy_avg_return_per_month_pct": 4.417867102767252,
+      "strategy_max_loss_pct": -11.702620639139457,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 214,
+      "entry_occurrence_count": 619,
+      "exit_occurrence_count": 214,
+      "base_occurrence_score": 833
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C2",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 1,
+      "condition_count": 1,
+      "rule_text": "close_ema_3_daily_volatility_5_daily >= 1.6353580277228665",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_volatility_5_daily",
+          "operator": ">=",
+          "threshold": 1.6353580277228665,
+          "condition": "close_ema_3_daily_volatility_5_daily >= 1.6353580277228665"
+        }
+      ],
+      "matched_count": 619,
+      "win_count": 166,
+      "loss_count": 453,
+      "win_rate": 0.2681744749596123,
+      "win_rate_pct": 26.81744749596123,
+      "total_return_pct": 141.5395667778983,
+      "average_return_pct": 0.22865842775104733,
+      "max_loss_pct": -9.598066541883696,
+      "max_gain_pct": 15.64246482726509,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.5004042037186742,
+      "match_rate_pct": 50.04042037186742,
+      "win_rate_lift_pct": 6.203057843576428,
+      "broadness_penalty": 0,
+      "loss_penalty": 22.650000000000002,
+      "base_score": 341.0512645011353,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C2",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C2",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_volatility_5_daily",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.6353580277228665,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 418,
+      "strategy_accuracy_pct": 43.54066985645933,
+      "strategy_avg_return_per_annum_pct": 32.28349968220895,
+      "strategy_avg_return_per_month_pct": 2.690291640184079,
+      "strategy_max_loss_pct": -11.702620639139457,
+      "dominant_exit_reason": "previous_low_before_entry_stop",
+      "dominant_exit_count": 213,
+      "entry_occurrence_count": 619,
+      "exit_occurrence_count": 213,
+      "base_occurrence_score": 832
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C3",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 1,
+      "condition_count": 1,
+      "rule_text": "close_ema_3_daily_slope_pct >= 1.9352918519347406",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": 1.9352918519347406,
+          "condition": "close_ema_3_daily_slope_pct >= 1.9352918519347406"
+        }
+      ],
+      "matched_count": 248,
+      "win_count": 111,
+      "loss_count": 137,
+      "win_rate": 0.4475806451612903,
+      "win_rate_pct": 44.75806451612903,
+      "total_return_pct": 402.11504586687033,
+      "average_return_pct": 1.621431636559961,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.20048504446240906,
+      "match_rate_pct": 20.048504446240905,
+      "win_rate_lift_pct": 24.14367486374423,
+      "broadness_penalty": 0,
+      "loss_penalty": 6.8500000000000005,
+      "base_score": 340.732669228401,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C3",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C3",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.9352918519347406,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 157,
+      "strategy_accuracy_pct": 56.68789808917197,
+      "strategy_avg_return_per_annum_pct": 67.15748954787637,
+      "strategy_avg_return_per_month_pct": 5.5964574623230305,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 138,
+      "entry_occurrence_count": 248,
+      "exit_occurrence_count": 138,
+      "base_occurrence_score": 386
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C4",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 2,
+      "condition_count": 2,
+      "rule_text": "close_ema_3_daily_slope_pct >= 1.9352918519347406 AND close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": 1.9352918519347406,
+          "condition": "close_ema_3_daily_slope_pct >= 1.9352918519347406"
+        },
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": 1.8888435519628795,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795"
+        }
+      ],
+      "matched_count": 248,
+      "win_count": 111,
+      "loss_count": 137,
+      "win_rate": 0.4475806451612903,
+      "win_rate_pct": 44.75806451612903,
+      "total_return_pct": 402.11504586687033,
+      "average_return_pct": 1.621431636559961,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.20048504446240906,
+      "match_rate_pct": 20.048504446240905,
+      "win_rate_lift_pct": 24.14367486374423,
+      "broadness_penalty": 0,
+      "loss_penalty": 6.8500000000000005,
+      "base_score": 340.732669228401,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C4",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C4",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.9352918519347406,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.8888435519628795,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 157,
+      "strategy_accuracy_pct": 56.68789808917197,
+      "strategy_avg_return_per_annum_pct": 67.15748954787637,
+      "strategy_avg_return_per_month_pct": 5.5964574623230305,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 138,
+      "entry_occurrence_count": 248,
+      "exit_occurrence_count": 138,
+      "base_occurrence_score": 386
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C5",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 2,
+      "condition_count": 2,
+      "rule_text": "close_ema_3_daily_slope_pct >= 1.9352918519347406 AND close_to_close_ema_3_daily_difference_pct >= -0.28338672864249204",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": 1.9352918519347406,
+          "condition": "close_ema_3_daily_slope_pct >= 1.9352918519347406"
+        },
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": -0.28338672864249204,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= -0.28338672864249204"
+        }
+      ],
+      "matched_count": 248,
+      "win_count": 111,
+      "loss_count": 137,
+      "win_rate": 0.4475806451612903,
+      "win_rate_pct": 44.75806451612903,
+      "total_return_pct": 402.11504586687033,
+      "average_return_pct": 1.621431636559961,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.20048504446240906,
+      "match_rate_pct": 20.048504446240905,
+      "win_rate_lift_pct": 24.14367486374423,
+      "broadness_penalty": 0,
+      "loss_penalty": 6.8500000000000005,
+      "base_score": 340.732669228401,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C5",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C5",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.9352918519347406,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": -0.28338672864249204,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 157,
+      "strategy_accuracy_pct": 56.68789808917197,
+      "strategy_avg_return_per_annum_pct": 67.15748954787637,
+      "strategy_avg_return_per_month_pct": 5.5964574623230305,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 138,
+      "entry_occurrence_count": 248,
+      "exit_occurrence_count": 138,
+      "base_occurrence_score": 386
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C6",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 2,
+      "condition_count": 2,
+      "rule_text": "close_ema_3_daily_slope_pct >= 1.9352918519347406 AND close_to_close_ema_3_daily_difference_pct >= 1.003098168620758",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": 1.9352918519347406,
+          "condition": "close_ema_3_daily_slope_pct >= 1.9352918519347406"
+        },
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": 1.003098168620758,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= 1.003098168620758"
+        }
+      ],
+      "matched_count": 248,
+      "win_count": 111,
+      "loss_count": 137,
+      "win_rate": 0.4475806451612903,
+      "win_rate_pct": 44.75806451612903,
+      "total_return_pct": 402.11504586687033,
+      "average_return_pct": 1.621431636559961,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.20048504446240906,
+      "match_rate_pct": 20.048504446240905,
+      "win_rate_lift_pct": 24.14367486374423,
+      "broadness_penalty": 0,
+      "loss_penalty": 6.8500000000000005,
+      "base_score": 340.732669228401,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C6",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C6",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.9352918519347406,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.003098168620758,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 157,
+      "strategy_accuracy_pct": 56.68789808917197,
+      "strategy_avg_return_per_annum_pct": 67.15748954787637,
+      "strategy_avg_return_per_month_pct": 5.5964574623230305,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 138,
+      "entry_occurrence_count": 248,
+      "exit_occurrence_count": 138,
+      "base_occurrence_score": 386
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C7",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 2,
+      "condition_count": 2,
+      "rule_text": "close_ema_3_daily_slope_pct >= 1.9352918519347406 AND close_to_close_ema_3_daily_difference_pct >= 0.2529055823789776",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": 1.9352918519347406,
+          "condition": "close_ema_3_daily_slope_pct >= 1.9352918519347406"
+        },
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": 0.2529055823789776,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= 0.2529055823789776"
+        }
+      ],
+      "matched_count": 248,
+      "win_count": 111,
+      "loss_count": 137,
+      "win_rate": 0.4475806451612903,
+      "win_rate_pct": 44.75806451612903,
+      "total_return_pct": 402.11504586687033,
+      "average_return_pct": 1.621431636559961,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.20048504446240906,
+      "match_rate_pct": 20.048504446240905,
+      "win_rate_lift_pct": 24.14367486374423,
+      "broadness_penalty": 0,
+      "loss_penalty": 6.8500000000000005,
+      "base_score": 340.732669228401,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C7",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C7",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.9352918519347406,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 0.2529055823789776,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 157,
+      "strategy_accuracy_pct": 56.68789808917197,
+      "strategy_avg_return_per_annum_pct": 67.15748954787637,
+      "strategy_avg_return_per_month_pct": 5.5964574623230305,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 138,
+      "entry_occurrence_count": 248,
+      "exit_occurrence_count": 138,
+      "base_occurrence_score": 386
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C8",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 1,
+      "condition_count": 1,
+      "rule_text": "close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795",
+      "conditions": [
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": 1.8888435519628795,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795"
+        }
+      ],
+      "matched_count": 249,
+      "win_count": 111,
+      "loss_count": 138,
+      "win_rate": 0.4457831325301205,
+      "win_rate_pct": 44.57831325301205,
+      "total_return_pct": 398.82737254374854,
+      "average_return_pct": 1.6017163555973837,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.20129345189975748,
+      "match_rate_pct": 20.129345189975748,
+      "win_rate_lift_pct": 23.963923600627247,
+      "broadness_penalty": 0,
+      "loss_penalty": 6.9,
+      "base_score": 339.7247670699284,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C8",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C8",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.8888435519628795,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 157,
+      "strategy_accuracy_pct": 56.68789808917197,
+      "strategy_avg_return_per_annum_pct": 67.15748954787637,
+      "strategy_avg_return_per_month_pct": 5.5964574623230305,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 138,
+      "entry_occurrence_count": 249,
+      "exit_occurrence_count": 138,
+      "base_occurrence_score": 387
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C9",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 2,
+      "condition_count": 2,
+      "rule_text": "close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795 AND close_ema_3_daily_slope_pct >= -0.28800660038466785",
+      "conditions": [
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": 1.8888435519628795,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795"
+        },
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": -0.28800660038466785,
+          "condition": "close_ema_3_daily_slope_pct >= -0.28800660038466785"
+        }
+      ],
+      "matched_count": 249,
+      "win_count": 111,
+      "loss_count": 138,
+      "win_rate": 0.4457831325301205,
+      "win_rate_pct": 44.57831325301205,
+      "total_return_pct": 398.82737254374854,
+      "average_return_pct": 1.6017163555973837,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.20129345189975748,
+      "match_rate_pct": 20.129345189975748,
+      "win_rate_lift_pct": 23.963923600627247,
+      "broadness_penalty": 0,
+      "loss_penalty": 6.9,
+      "base_score": 339.7247670699284,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C9",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C9",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.8888435519628795,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": -0.28800660038466785,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 157,
+      "strategy_accuracy_pct": 56.68789808917197,
+      "strategy_avg_return_per_annum_pct": 67.15748954787637,
+      "strategy_avg_return_per_month_pct": 5.5964574623230305,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 138,
+      "entry_occurrence_count": 249,
+      "exit_occurrence_count": 138,
+      "base_occurrence_score": 387
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C10",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 2,
+      "condition_count": 2,
+      "rule_text": "close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795 AND close_ema_3_daily_slope_pct >= 1.0132621830219937",
+      "conditions": [
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": 1.8888435519628795,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795"
+        },
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": 1.0132621830219937,
+          "condition": "close_ema_3_daily_slope_pct >= 1.0132621830219937"
+        }
+      ],
+      "matched_count": 249,
+      "win_count": 111,
+      "loss_count": 138,
+      "win_rate": 0.4457831325301205,
+      "win_rate_pct": 44.57831325301205,
+      "total_return_pct": 398.82737254374854,
+      "average_return_pct": 1.6017163555973837,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.20129345189975748,
+      "match_rate_pct": 20.129345189975748,
+      "win_rate_lift_pct": 23.963923600627247,
+      "broadness_penalty": 0,
+      "loss_penalty": 6.9,
+      "base_score": 339.7247670699284,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C10",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C10",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.8888435519628795,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.0132621830219937,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 157,
+      "strategy_accuracy_pct": 56.68789808917197,
+      "strategy_avg_return_per_annum_pct": 67.15748954787637,
+      "strategy_avg_return_per_month_pct": 5.5964574623230305,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 138,
+      "entry_occurrence_count": 249,
+      "exit_occurrence_count": 138,
+      "base_occurrence_score": 387
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C11",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 2,
+      "condition_count": 2,
+      "rule_text": "close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795 AND close_ema_3_daily_slope_pct >= 0.2627015027787666",
+      "conditions": [
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": 1.8888435519628795,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795"
+        },
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": 0.2627015027787666,
+          "condition": "close_ema_3_daily_slope_pct >= 0.2627015027787666"
+        }
+      ],
+      "matched_count": 249,
+      "win_count": 111,
+      "loss_count": 138,
+      "win_rate": 0.4457831325301205,
+      "win_rate_pct": 44.57831325301205,
+      "total_return_pct": 398.82737254374854,
+      "average_return_pct": 1.6017163555973837,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.20129345189975748,
+      "match_rate_pct": 20.129345189975748,
+      "win_rate_lift_pct": 23.963923600627247,
+      "broadness_penalty": 0,
+      "loss_penalty": 6.9,
+      "base_score": 339.7247670699284,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C11",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C11",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.8888435519628795,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 0.2627015027787666,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 157,
+      "strategy_accuracy_pct": 56.68789808917197,
+      "strategy_avg_return_per_annum_pct": 67.15748954787637,
+      "strategy_avg_return_per_month_pct": 5.5964574623230305,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 138,
+      "entry_occurrence_count": 249,
+      "exit_occurrence_count": 138,
+      "base_occurrence_score": 387
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C12",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 1,
+      "condition_count": 1,
+      "rule_text": "close_ema_3_daily_slope_pct >= -0.28800660038466785",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": -0.28800660038466785,
+          "condition": "close_ema_3_daily_slope_pct >= -0.28800660038466785"
+        }
+      ],
+      "matched_count": 619,
+      "win_count": 164,
+      "loss_count": 455,
+      "win_rate": 0.2649434571890145,
+      "win_rate_pct": 26.494345718901453,
+      "total_return_pct": 424.8273304302803,
+      "average_return_pct": 0.6863123270279164,
+      "max_loss_pct": -10.073380096813704,
+      "max_gain_pct": 13.960394001558718,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.5004042037186742,
+      "match_rate_pct": 50.04042037186742,
+      "win_rate_lift_pct": 5.879956066516652,
+      "broadness_penalty": 0,
+      "loss_penalty": 22.75,
+      "base_score": 336.708717313667,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C12",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C12",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": -0.28800660038466785,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 371,
+      "strategy_accuracy_pct": 47.16981132075472,
+      "strategy_avg_return_per_annum_pct": 71.29555962515354,
+      "strategy_avg_return_per_month_pct": 5.941296635429461,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 281,
+      "entry_occurrence_count": 619,
+      "exit_occurrence_count": 281,
+      "base_occurrence_score": 900
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C13",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 1,
+      "condition_count": 1,
+      "rule_text": "close_to_close_ema_3_daily_difference_pct >= -0.28338672864249204",
+      "conditions": [
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": -0.28338672864249204,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= -0.28338672864249204"
+        }
+      ],
+      "matched_count": 619,
+      "win_count": 164,
+      "loss_count": 455,
+      "win_rate": 0.2649434571890145,
+      "win_rate_pct": 26.494345718901453,
+      "total_return_pct": 424.65369516268686,
+      "average_return_pct": 0.6860318177103181,
+      "max_loss_pct": -10.073380096813704,
+      "max_gain_pct": 13.960394001558718,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.5004042037186742,
+      "match_rate_pct": 50.04042037186742,
+      "win_rate_lift_pct": 5.879956066516652,
+      "broadness_penalty": 0,
+      "loss_penalty": 22.75,
+      "base_score": 336.7078757857142,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C13",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C13",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": -0.28338672864249204,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 371,
+      "strategy_accuracy_pct": 47.16981132075472,
+      "strategy_avg_return_per_annum_pct": 71.58792520822705,
+      "strategy_avg_return_per_month_pct": 5.965660434018921,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 282,
+      "entry_occurrence_count": 619,
+      "exit_occurrence_count": 282,
+      "base_occurrence_score": 901
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C14",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 2,
+      "condition_count": 2,
+      "rule_text": "close_ema_3_daily_range_5_pct >= 5.443470843473113 AND close_ema_3_daily_slope_pct >= 1.9352918519347406",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_range_5_pct",
+          "operator": ">=",
+          "threshold": 5.443470843473113,
+          "condition": "close_ema_3_daily_range_5_pct >= 5.443470843473113"
+        },
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": 1.9352918519347406,
+          "condition": "close_ema_3_daily_slope_pct >= 1.9352918519347406"
+        }
+      ],
+      "matched_count": 189,
+      "win_count": 94,
+      "loss_count": 95,
+      "win_rate": 0.4973544973544973,
+      "win_rate_pct": 49.735449735449734,
+      "total_return_pct": 370.94605170393754,
+      "average_return_pct": 1.9626775222430557,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.15278900565885206,
+      "match_rate_pct": 15.278900565885206,
+      "win_rate_lift_pct": 29.121060083064933,
+      "broadness_penalty": 0,
+      "loss_penalty": 4.75,
+      "base_score": 334.74333298205386,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C14",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C14",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_range_5_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 5.443470843473113,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.9352918519347406,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 112,
+      "strategy_accuracy_pct": 62.5,
+      "strategy_avg_return_per_annum_pct": 72.33298489538674,
+      "strategy_avg_return_per_month_pct": 6.027748741282228,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 104,
+      "entry_occurrence_count": 189,
+      "exit_occurrence_count": 104,
+      "base_occurrence_score": 293
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C15",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 2,
+      "condition_count": 2,
+      "rule_text": "close_ema_3_daily_range_5_pct >= 5.443470843473113 AND close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_range_5_pct",
+          "operator": ">=",
+          "threshold": 5.443470843473113,
+          "condition": "close_ema_3_daily_range_5_pct >= 5.443470843473113"
+        },
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": 1.8888435519628795,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795"
+        }
+      ],
+      "matched_count": 189,
+      "win_count": 94,
+      "loss_count": 95,
+      "win_rate": 0.4973544973544973,
+      "win_rate_pct": 49.735449735449734,
+      "total_return_pct": 370.94605170393754,
+      "average_return_pct": 1.9626775222430557,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.15278900565885206,
+      "match_rate_pct": 15.278900565885206,
+      "win_rate_lift_pct": 29.121060083064933,
+      "broadness_penalty": 0,
+      "loss_penalty": 4.75,
+      "base_score": 334.74333298205386,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C15",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C15",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_range_5_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 5.443470843473113,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.8888435519628795,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 112,
+      "strategy_accuracy_pct": 62.5,
+      "strategy_avg_return_per_annum_pct": 72.33298489538674,
+      "strategy_avg_return_per_month_pct": 6.027748741282228,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 104,
+      "entry_occurrence_count": 189,
+      "exit_occurrence_count": 104,
+      "base_occurrence_score": 293
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C16",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 3,
+      "condition_count": 3,
+      "rule_text": "close_ema_3_daily_range_5_pct >= 5.443470843473113 AND close_ema_3_daily_slope_pct >= 1.9352918519347406 AND close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_range_5_pct",
+          "operator": ">=",
+          "threshold": 5.443470843473113,
+          "condition": "close_ema_3_daily_range_5_pct >= 5.443470843473113"
+        },
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": 1.9352918519347406,
+          "condition": "close_ema_3_daily_slope_pct >= 1.9352918519347406"
+        },
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": 1.8888435519628795,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795"
+        }
+      ],
+      "matched_count": 189,
+      "win_count": 94,
+      "loss_count": 95,
+      "win_rate": 0.4973544973544973,
+      "win_rate_pct": 49.735449735449734,
+      "total_return_pct": 370.94605170393754,
+      "average_return_pct": 1.9626775222430557,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.15278900565885206,
+      "match_rate_pct": 15.278900565885206,
+      "win_rate_lift_pct": 29.121060083064933,
+      "broadness_penalty": 0,
+      "loss_penalty": 4.75,
+      "base_score": 334.74333298205386,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C16",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C16",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_range_5_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 5.443470843473113,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.9352918519347406,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.8888435519628795,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 112,
+      "strategy_accuracy_pct": 62.5,
+      "strategy_avg_return_per_annum_pct": 72.33298489538674,
+      "strategy_avg_return_per_month_pct": 6.027748741282228,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 104,
+      "entry_occurrence_count": 189,
+      "exit_occurrence_count": 104,
+      "base_occurrence_score": 293
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C17",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 3,
+      "condition_count": 3,
+      "rule_text": "close_ema_3_daily_range_5_pct >= 5.443470843473113 AND close_ema_3_daily_slope_pct >= 1.9352918519347406 AND close_to_close_ema_3_daily_difference_pct >= -0.28338672864249204",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_range_5_pct",
+          "operator": ">=",
+          "threshold": 5.443470843473113,
+          "condition": "close_ema_3_daily_range_5_pct >= 5.443470843473113"
+        },
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": 1.9352918519347406,
+          "condition": "close_ema_3_daily_slope_pct >= 1.9352918519347406"
+        },
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": -0.28338672864249204,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= -0.28338672864249204"
+        }
+      ],
+      "matched_count": 189,
+      "win_count": 94,
+      "loss_count": 95,
+      "win_rate": 0.4973544973544973,
+      "win_rate_pct": 49.735449735449734,
+      "total_return_pct": 370.94605170393754,
+      "average_return_pct": 1.9626775222430557,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.15278900565885206,
+      "match_rate_pct": 15.278900565885206,
+      "win_rate_lift_pct": 29.121060083064933,
+      "broadness_penalty": 0,
+      "loss_penalty": 4.75,
+      "base_score": 334.74333298205386,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C17",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C17",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_range_5_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 5.443470843473113,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.9352918519347406,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": -0.28338672864249204,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 112,
+      "strategy_accuracy_pct": 62.5,
+      "strategy_avg_return_per_annum_pct": 72.33298489538674,
+      "strategy_avg_return_per_month_pct": 6.027748741282228,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 104,
+      "entry_occurrence_count": 189,
+      "exit_occurrence_count": 104,
+      "base_occurrence_score": 293
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C18",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 3,
+      "condition_count": 3,
+      "rule_text": "close_ema_3_daily_range_5_pct >= 5.443470843473113 AND close_ema_3_daily_slope_pct >= 1.9352918519347406 AND close_to_close_ema_3_daily_difference_pct >= 1.003098168620758",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_range_5_pct",
+          "operator": ">=",
+          "threshold": 5.443470843473113,
+          "condition": "close_ema_3_daily_range_5_pct >= 5.443470843473113"
+        },
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": 1.9352918519347406,
+          "condition": "close_ema_3_daily_slope_pct >= 1.9352918519347406"
+        },
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": 1.003098168620758,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= 1.003098168620758"
+        }
+      ],
+      "matched_count": 189,
+      "win_count": 94,
+      "loss_count": 95,
+      "win_rate": 0.4973544973544973,
+      "win_rate_pct": 49.735449735449734,
+      "total_return_pct": 370.94605170393754,
+      "average_return_pct": 1.9626775222430557,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.15278900565885206,
+      "match_rate_pct": 15.278900565885206,
+      "win_rate_lift_pct": 29.121060083064933,
+      "broadness_penalty": 0,
+      "loss_penalty": 4.75,
+      "base_score": 334.74333298205386,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C18",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C18",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_range_5_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 5.443470843473113,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.9352918519347406,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.003098168620758,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 112,
+      "strategy_accuracy_pct": 62.5,
+      "strategy_avg_return_per_annum_pct": 72.33298489538674,
+      "strategy_avg_return_per_month_pct": 6.027748741282228,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 104,
+      "entry_occurrence_count": 189,
+      "exit_occurrence_count": 104,
+      "base_occurrence_score": 293
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C19",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 3,
+      "condition_count": 3,
+      "rule_text": "close_ema_3_daily_range_5_pct >= 5.443470843473113 AND close_ema_3_daily_slope_pct >= 1.9352918519347406 AND close_to_close_ema_3_daily_difference_pct >= 0.2529055823789776",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_range_5_pct",
+          "operator": ">=",
+          "threshold": 5.443470843473113,
+          "condition": "close_ema_3_daily_range_5_pct >= 5.443470843473113"
+        },
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": 1.9352918519347406,
+          "condition": "close_ema_3_daily_slope_pct >= 1.9352918519347406"
+        },
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": 0.2529055823789776,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= 0.2529055823789776"
+        }
+      ],
+      "matched_count": 189,
+      "win_count": 94,
+      "loss_count": 95,
+      "win_rate": 0.4973544973544973,
+      "win_rate_pct": 49.735449735449734,
+      "total_return_pct": 370.94605170393754,
+      "average_return_pct": 1.9626775222430557,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.15278900565885206,
+      "match_rate_pct": 15.278900565885206,
+      "win_rate_lift_pct": 29.121060083064933,
+      "broadness_penalty": 0,
+      "loss_penalty": 4.75,
+      "base_score": 334.74333298205386,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C19",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C19",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_range_5_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 5.443470843473113,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.9352918519347406,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 0.2529055823789776,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 112,
+      "strategy_accuracy_pct": 62.5,
+      "strategy_avg_return_per_annum_pct": 72.33298489538674,
+      "strategy_avg_return_per_month_pct": 6.027748741282228,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 104,
+      "entry_occurrence_count": 189,
+      "exit_occurrence_count": 104,
+      "base_occurrence_score": 293
+    },
+    {
+      "rule_id": "JYOTISTRUC_MINED_BASE_G0_C20",
+      "parent_rule_id": "",
+      "generation": 0,
+      "depth": 3,
+      "condition_count": 3,
+      "rule_text": "close_ema_3_daily_range_5_pct >= 5.443470843473113 AND close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795 AND close_ema_3_daily_slope_pct >= -0.28800660038466785",
+      "conditions": [
+        {
+          "feature": "close_ema_3_daily_range_5_pct",
+          "operator": ">=",
+          "threshold": 5.443470843473113,
+          "condition": "close_ema_3_daily_range_5_pct >= 5.443470843473113"
+        },
+        {
+          "feature": "close_to_close_ema_3_daily_difference_pct",
+          "operator": ">=",
+          "threshold": 1.8888435519628795,
+          "condition": "close_to_close_ema_3_daily_difference_pct >= 1.8888435519628795"
+        },
+        {
+          "feature": "close_ema_3_daily_slope_pct",
+          "operator": ">=",
+          "threshold": -0.28800660038466785,
+          "condition": "close_ema_3_daily_slope_pct >= -0.28800660038466785"
+        }
+      ],
+      "matched_count": 189,
+      "win_count": 94,
+      "loss_count": 95,
+      "win_rate": 0.4973544973544973,
+      "win_rate_pct": 49.735449735449734,
+      "total_return_pct": 370.94605170393754,
+      "average_return_pct": 1.9626775222430557,
+      "max_loss_pct": -6.408488993877579,
+      "max_gain_pct": 13.166307479846493,
+      "baseline_win_rate_pct": 20.6143896523848,
+      "match_rate": 0.15278900565885206,
+      "match_rate_pct": 15.278900565885206,
+      "win_rate_lift_pct": 29.121060083064933,
+      "broadness_penalty": 0,
+      "loss_penalty": 4.75,
+      "base_score": 334.74333298205386,
+      "case_filter_rule": null,
+      "strategy_name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C20",
+      "strategy": {
+        "name": "mined_base_entry_JYOTISTRUC_JYOTISTRUC_MINED_BASE_G0_C20",
+        "timeframe": "daily",
+        "entry_price_column": "Close",
+        "exit_price_column": "Close",
+        "max_holding_days": 2,
+        "profit_target_pct": 999,
+        "stop_loss_type": "previous_low_before_entry",
+        "close_open_trade_on_last_row": true,
+        "entry_signal_column": "strategy_entry_signal",
+        "exit_signal_column": "strategy_exit_signal",
+        "position_column": "strategy_position",
+        "entry_rule": {
+          "logic": "and",
+          "rules": [
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_range_5_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 5.443470843473113,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_to_close_ema_3_daily_difference_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": 1.8888435519628795,
+                "include_min": true
+              }
+            },
+            {
+              "type": "condition",
+              "operator": "inRange",
+              "left": {
+                "type": "column",
+                "column": "close_ema_3_daily_slope_pct",
+                "row_offset": 0
+              },
+              "range": {
+                "min": -0.28800660038466785,
+                "include_min": true
+              }
+            }
+          ]
+        }
+      },
+      "strategy_trade_count": 112,
+      "strategy_accuracy_pct": 62.5,
+      "strategy_avg_return_per_annum_pct": 72.33298489538674,
+      "strategy_avg_return_per_month_pct": 6.027748741282228,
+      "strategy_max_loss_pct": -11.203320633211575,
+      "dominant_exit_reason": "max_holding_days",
+      "dominant_exit_count": 104,
+      "entry_occurrence_count": 189,
+      "exit_occurrence_count": 104,
+      "base_occurrence_score": 293
+    }
+  ]
+}

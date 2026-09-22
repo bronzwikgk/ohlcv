@@ -1,0 +1,18 @@
+{
+  "total_trades": 427,
+  "winning_trades": 189,
+  "losing_trades": 238,
+  "accuracy": 0.4426229508196721,
+  "accuracy_pct": 44.26229508196721,
+  "total_return_pct": 269.48989326880235,
+  "average_return_per_trade_pct": 0.6311238718238931,
+  "avg_return_per_month_pct": 4.417867102767252,
+  "avg_return_per_annum_pct": 53.01440523320702,
+  "max_gain_pct": 16.983245700074214,
+  "max_loss_pct": -11.702620639139457,
+  "calendar_month_count": 61,
+  "exit_reasons": {
+    "previous_low_before_entry_stop": 213,
+    "max_holding_days": 214
+  }
+}

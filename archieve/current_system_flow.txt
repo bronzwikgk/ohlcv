@@ -1,0 +1,276 @@
+CURRENT SYSTEM FLOW
+
+1. Load symbols
+
+The system starts with the active symbol list from the selected bracket.
+Currently the bracket is positive_3_5.
+
+The active run uses the first 5 symbols from that bracket:
+
+LLOYDSENGG
+JYOTISTRUC
+KERNEX
+HUBTOWN
+NPST
+
+
+2. Load historical data
+
+For each symbol, the system loads its CSV file from:
+
+E:\july_2026\miner_signal_notebook\market_data_cache
+
+The CSV is converted into the active dataframe structure.
+
+
+3. Check minimum rows
+
+The system checks that each symbol has enough historical data.
+
+Current minimum:
+
+800 rows
+
+If a symbol has fewer rows, the system stops for that symbol.
+
+
+4. Calculate derivatives
+
+The system calculates all configured derivative features.
+
+Current derivative groups include:
+
+mean open-close
+close EMAs
+volume EMAs
+high EMAs
+low EMAs
+price-to-EMA distance percent
+volume-to-EMA distance percent
+high-low ratio
+EMA slope percent
+EMA volatility or flatness
+EMA rolling range percent
+
+
+5. Label the target
+
+The system labels whether the future target was met.
+
+Current target:
+
+price column: Close
+target time: next 1 day
+target bracket: +3% to +5%
+
+For each row, the system calculates:
+
+target_change_pct
+target_label
+enter_label
+exit_label
+
+
+6. Mine base entry rule per symbol
+
+The system creates entry cases from the data.
+
+Each case means:
+
+today's derivative features -> future target result
+
+Then it mines feature conditions such as:
+
+close_to_ema_3_pct >= X
+EMA volatility >= Y
+volume_to_ema_21_pct <= Z
+
+The system rejects rules that are too broad or not better than baseline.
+
+A mined base candidate must have:
+
+enough matches
+positive average return
+win-rate lift over symbol baseline
+not too much dataset coverage
+
+The system ranks base candidates by useful occurrence:
+
+win count
+win-rate lift
+average return
+base score
+dominant exit occurrence
+
+
+7. Replace the manual base strategy
+
+If enabled, the best mined base rule becomes the strategy entry rule.
+
+The old manual fallback is:
+
+mean(open, close) crosses above EMA 21
+AND close > EMA 55
+
+The new preferred behavior is:
+
+use the best mined base entry rule for that symbol
+
+The current exit remains:
+
+exit after 2 days
+or stop if close goes below the low of one day before entry
+
+
+8. Backtest the mined base strategy
+
+The system runs the selected base strategy and records:
+
+trades
+winning trades
+losing trades
+accuracy
+monthly return
+annual return
+max gain
+max loss
+exit reasons
+
+
+9. Mine loss trades
+
+The system looks at losing trades and finds derivative conditions that appear mostly in losses.
+
+These become miss-avoid candidates.
+
+Examples:
+
+avoid weak volume
+avoid overextended price
+avoid unstable EMA trend
+avoid negative short-term momentum
+
+
+10. Mine hit cases
+
+The system looks at strong target or hit cases and finds derivative conditions that appear before success.
+
+These become hit-confirm candidates.
+
+Examples:
+
+require momentum
+require volume strength
+require positive EMA structure
+require acceptable EMA volatility
+
+
+11. Recursively optimize strategy
+
+The optimizer creates child strategy versions.
+
+It can add:
+
+hit-confirm filters
+miss-avoid filters
+both hit-confirm and miss-avoid filters
+
+Example:
+
+base rule
+AND hit-confirm condition
+AND NOT miss condition
+
+The optimizer tests combinations recursively up to the configured depth.
+
+Current depth:
+
+3
+
+A promoted child must improve something meaningful:
+
+hit rate
+annual return
+max loss
+
+Current full success target:
+
+accuracy >= 75%
+annual return >= 25%
+minimum trades >= 15
+
+
+12. Save per-symbol reports
+
+For each symbol, the system saves:
+
+processed dataframe CSV
+base entry candidates CSV
+base entry report JSON
+strategy trades CSV
+strategy report JSON
+miss candidates CSV
+miss report JSON
+hit case candidates CSV
+hit case report JSON
+strategy optimization candidates CSV
+strategy optimization report JSON
+
+
+13. Mine common rules across all symbols
+
+After all per-symbol runs finish, the system pools entry cases from all active symbols.
+
+The pooled dataset contains:
+
+LLOYDSENGG cases
+JYOTISTRUC cases
+KERNEX cases
+HUBTOWN cases
+NPST cases
+
+The common-rule miner searches for rules that work across multiple symbols.
+
+A common rule must not work only because of one stock.
+
+Current common-rule requirements:
+
+minimum symbols passed: 3
+minimum matches per symbol: 10
+minimum win-rate lift per symbol: 5%
+maximum one-symbol match share: 60%
+
+
+14. Save common-rule reports
+
+The system saves:
+
+positive_3_5_common_rule_report.json
+positive_3_5_common_rule_candidates.csv
+
+
+15. Current learning structure
+
+The system now has two learning paths.
+
+Per-symbol learning:
+
+find the best rule for each stock
+optimize each stock's rule using its profit and loss cases
+
+Common-rule learning:
+
+pool cases from all stocks
+find one rule that works across multiple stocks
+validate that rule per symbol
+
+
+16. Desired direction
+
+The long-term direction is:
+
+mine common base rule
+validate common rule across symbols
+evolve common rule using pooled success and failure cases
+only branch into symbol-specific rules if the common rule fails for a symbol
+
