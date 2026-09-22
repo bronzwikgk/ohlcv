@@ -5,7 +5,7 @@
 This project finds short-term stock trading conditions from OHLCV-style daily data. The current target is configurable future return mining, for example:
 
 ```text
-future return over 1, 3, 5, or 8 trading days >= 3%
+future return over 1, 3, 5, 8, 13 trading days >= 3%
 ```
 
 The larger goal is to move from exploratory condition mining into a repeatable strategy workflow:
