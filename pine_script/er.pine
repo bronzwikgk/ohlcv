@@ -1,0 +1,56 @@
+//@version=6
+indicator('Efficiency Ratio Trend', overlay = true, max_bars_back = 5000, max_boxes_count = 500, max_labels_count = 500, max_lines_count = 500, max_polylines_count = 100)
+
+bullCol = color.new(#0df1c6, 20)
+bearCol = #871ee9
+
+markrtStairsSen = input.float(defval = 2.0, title = '', inline = '7', minval = 0.01, display = display.none)
+length = input(200, 'Length')
+fastLen = input(100, 'Fast Length')
+slowLen = input(400, 'Slow Length')
+Src = input(close)
+
+
+m_function(float sensitivitygg, color bullCol, color bearCol) =>
+    lengthf = length
+    fast = fastLen
+    slow = slowLen
+    src = Src
+
+    er = math.abs(ta.change(src, lengthf)) / math.sum(math.abs(ta.change(src)), lengthf)
+    dev = er * ta.stdev(src * 2, fast) + (1 - er) * ta.stdev(src * 2, slow)
+    a = 0.
+    a := src > nz(a[1], src) + dev ? src : src < nz(a[1], src) - dev ? src : nz(a[1], src)
+
+    css = fixnan(a > a[1] ? bullCol : a < a[1] ? bearCol : na)
+
+    delta = (a - a[1]) / a[1]
+    atr_length = 14
+    atr_val = ta.atr(atr_length)
+    price_scale = a != 0 ? a : close
+    volatility_pct = atr_val / price_scale
+
+    sensitivity1 = 0.01
+
+    threshold = volatility_pct * sensitivity1
+    clr = math.abs(delta) < threshold ? na : delta > 0 ? bullCol : bearCol
+
+    var int trend = 0
+
+    // Only consider changes above threshold
+    if math.abs(delta) >= threshold
+        trend := delta > 0 ? 1 : 0
+        trend
+    else // If below threshold, keep previous trend (trend unchanged)
+        trend := trend
+        trend
+
+    isBullms = trend == 1
+
+    [a, css, isBullms]
+
+[a, css, isBullms] = m_function(markrtStairsSen, bullCol, bearCol)
+
+
+//plot(markrtStairs ? a : na, color = plotColor, linewidth=3, style=plot.style_stepline_diamond, editable=false)
+plot(a, color = isBullms ? bullCol : bearCol, linewidth = 3, style = plot.style_stepline_diamond, editable = false)

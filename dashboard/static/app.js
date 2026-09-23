@@ -67,9 +67,9 @@ function renderCharts(data) {
     distanceChart = LightweightCharts.createChart(distanceContainer, chartOptions);
     efficiencyChart = LightweightCharts.createChart(efficiencyContainer, chartOptions);
 
-    priceSeries = priceChart.addLineSeries({ color: '#10B981', lineWidth: 2 });
-    distanceSeries = distanceChart.addLineSeries({ color: '#F59E0B', lineWidth: 2 });
-    efficiencySeries = efficiencyChart.addLineSeries({ color: '#3B82F6', lineWidth: 2 });
+    priceSeries = priceChart.addSeries(LightweightCharts.LineSeries, { color: '#10B981', lineWidth: 2 });
+    distanceSeries = distanceChart.addSeries(LightweightCharts.LineSeries, { color: '#F59E0B', lineWidth: 2 });
+    efficiencySeries = efficiencyChart.addSeries(LightweightCharts.LineSeries, { color: '#3B82F6', lineWidth: 2 });
 
     const priceData = [];
     const distanceData = [];
