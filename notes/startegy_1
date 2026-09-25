@@ -1,0 +1,19 @@
+- Regime Filter:
+    - Close above EMA 20
+    - EMA 20 slope > 0
+    - ADX > 20 or ADX rising
+    - Omega > 50
+
+- Entry Trigger
+    - RSI 3 pulls below 30, then crosses back above 30, or
+    - RSI 3 crosses above 50 while RSI 21 > 50
+- Avoid Filter:
+    - ATR% not too high
+    - Avoid entries after giant candles
+
+- Exit : 
+    - Hold 3-10 bars
+    - Exit if RSI 3 > 70 or 80
+    - Exit if close falls below EMA 20
+    - Stop below recent swing low or 1.5 ATR
+    - Target 5% 

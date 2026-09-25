@@ -1,0 +1,136 @@
+import nbformat as nbf
+
+with open('E:\\github\\ohlcv\\notebook\\behavioral_signature_1.ipynb', 'r') as f:
+    nb = nbf.read(f, as_version=4)
+
+new_code = """# Cell 3: Extracting and Plotting 21-Day Blocks
+BLOCK_SIZE = 21
+
+blocks_34 = []
+blocks_21 = []
+
+for symbol in selected_files:
+    df = data_dict[symbol]
+    
+    for i in range(BLOCK_SIZE, len(df)):
+        if df.iloc[i]['Omega_34_PR'] > 50:
+            block = df.iloc[i - BLOCK_SIZE + 1 : i + 1].copy()
+            block['Symbol'] = symbol
+            # Calculate the 14-day past return exactly on the trigger day (i)
+            # which corresponds to the last 14 days of the block
+            past_14_start = df.iloc[i - 13]['Close']
+            past_14_end = df.iloc[i]['Close']
+            block['Past_14_Return'] = ((past_14_end - past_14_start) / past_14_start) * 100
+            
+            first_close = block['Close'].iloc[0]
+            block['Normalized_Close'] = (block['Close'] / first_close) * 100
+            blocks_34.append(block)
+            
+        if df.iloc[i]['Omega_21_PR'] > 50:
+            block = df.iloc[i - BLOCK_SIZE + 1 : i + 1].copy()
+            block['Symbol'] = symbol
+            
+            past_14_start = df.iloc[i - 13]['Close']
+            past_14_end = df.iloc[i]['Close']
+            block['Past_14_Return'] = ((past_14_end - past_14_start) / past_14_start) * 100
+            
+            first_close = block['Close'].iloc[0]
+            block['Normalized_Close'] = (block['Close'] / first_close) * 100
+            blocks_21.append(block)
+
+total_possible = sum([len(df) - BLOCK_SIZE for df in data_dict.values()])
+summary_df = pd.DataFrame({
+    "Regime": ["All Possible 21-Day Blocks", "Omega 34 > 50", "Omega 21 > 50"],
+    "Total Blocks": [total_possible, len(blocks_34), len(blocks_21)]
+})
+from IPython.display import display, HTML
+display(HTML("<h3>Block Extraction Summary</h3>"))
+display(summary_df)
+
+def plot_25_samples_clustered(block_list, title):
+    if len(block_list) == 0: return
+    sample_size = min(25, len(block_list))
+    import random
+    sample_blocks = random.sample(block_list, sample_size)
+    
+    returns_14d = []
+    atrs_14d = []
+    labels_text = []
+    
+    for b in sample_blocks:
+        # Grab the specific 14-day indicators calculated on the exact trigger day
+        ret_14 = b['Past_14_Return'].iloc[0] # we saved this value into the block dataframe
+        atr_14 = b['ATR_Pct'].iloc[-1]       # this is the 14-day ATR on the trigger day
+        
+        returns_14d.append(ret_14)
+        atrs_14d.append(atr_14)
+        labels_text.append(b['Symbol'].iloc[0])
+        
+    from sklearn.cluster import KMeans
+    import numpy as np
+    
+    # We cluster purely based on the 14-day snapshot indicators, NOT the 21-day visual shape!
+    X = np.column_stack((returns_14d, atrs_14d))
+    kmeans = KMeans(n_clusters=4, random_state=42, n_init=10).fit(X)
+    cluster_labels = kmeans.labels_
+    centroids = kmeans.cluster_centers_
+    
+    # Sort blocks by cluster ID to group them in the grid
+    bundled = list(zip(sample_blocks, returns_14d, atrs_14d, labels_text, cluster_labels))
+    bundled.sort(key=lambda x: x[4]) 
+    sample_blocks, returns_14d, atrs_14d, labels_text, cluster_labels = zip(*bundled)
+    
+    colors = ['#ef4444', '#3b82f6', '#22c55e', '#f59e0b']
+    
+    import matplotlib.pyplot as plt
+    fig, axes = plt.subplots(5, 5, figsize=(22, 16))
+    
+    for i in range(25):
+        row = i // 5
+        col = i % 5
+        ax_price = axes[row, col]
+        
+        if i < len(sample_blocks):
+            block = sample_blocks[i]
+            cluster = cluster_labels[i]
+            c_color = colors[cluster % 4]
+            days = range(1, BLOCK_SIZE + 1)
+            
+            ax_price.plot(days, block['Normalized_Close'], color='black', linewidth=1.5)
+            end_val = block['Normalized_Close'].iloc[-1]
+            ax_price.plot(days[-1], end_val, marker='o', markersize=8, color=c_color) 
+            
+            ax_price.set_title(f"[#{i+1}] {block['Symbol'].iloc[0]} (C{cluster})", fontsize=11, color=c_color, weight='bold')
+            ax_price.axhline(100, color='gray', linestyle='--', alpha=0.5)
+            ax_price.set_xticks([])
+            ax_price.grid(True, alpha=0.3)
+        else:
+            ax_price.axis('off')
+            
+    plt.suptitle(f"{title} - Price Panels (Sorted by Indicator Clusters)", fontsize=18, y=1.01)
+    plt.tight_layout()
+    plt.show()
+    
+    # Scatter Plot mapping the 14-Day Snapshot Indicators
+    plt.figure(figsize=(10, 6))
+    for i in range(len(returns_14d)):
+        c_color = colors[cluster_labels[i] % 4]
+        plt.scatter(returns_14d[i], atrs_14d[i], color=c_color, s=150, alpha=0.8, edgecolor='black')
+        plt.annotate(f"[#{i+1}] {labels_text[i]}", (returns_14d[i], atrs_14d[i]), xytext=(5, 5), textcoords='offset points', fontsize=9, weight='bold')
+        
+    plt.scatter(centroids[:, 0], centroids[:, 1], c='black', s=200, marker='X', label='Cluster Centers')
+    plt.axvline(0, color='red', linestyle='--', alpha=0.3)
+    plt.title(f'K-Means Scatter Plot using Past 14-Day Indicators ({title})', fontsize=14)
+    plt.xlabel('Past 14-Day Return (%) on Trigger Day', fontsize=12)
+    plt.ylabel('Past 14-Day ATR (%) on Trigger Day', fontsize=12)
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.show()
+
+plot_25_samples_clustered(blocks_34, "Omega 34 > 50")
+plot_25_samples_clustered(blocks_21, "Omega 21 > 50")
+"""
+
+nb.cells[-1].source = new_code
+with open('E:\\github\\ohlcv\\notebook\\behavioral_signature_1.ipynb', 'w') as f:
+    nbf.write(nb, f)

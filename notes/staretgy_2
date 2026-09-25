@@ -1,0 +1,12 @@
+Regime:
+    - Omega 20 > 50
+    - EMA 20 slope > 0
+
+- Trigger:
+    - Omega 5 crosses above 50
+    - or Omega 5 crosses above 25 after being weak
+
+- Avoid:
+    - Omega 20 < 50
+    - ADX too low and flat
+    - ATR% too high

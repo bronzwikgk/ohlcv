@@ -1,0 +1,12 @@
+- Strategy Trade Test Report Shape:
+    - Strategy Name:
+    - Number of Stocks:
+    - Stock Seed:
+    - Stock Periods
+    - Startegy Rules:
+        - Behaviour Classification :  Stats
+            - Regime Classification: Stats
+                - Setup
+                    - Entry
+                    - Exit
+                    - Stop Loss
