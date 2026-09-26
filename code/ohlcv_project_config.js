@@ -390,7 +390,7 @@ var ohlcv_project_config = {
     },
     holding: {
       enforce_max_holding_days: true,
-      max_holding_days: 5,
+      max_holding_days: 13,
       day_bar_column: "date"
     },
     strategy_recipes: [
@@ -462,7 +462,7 @@ var ohlcv_project_config = {
         },
         take_profit: {
           enabled: true,
-          value: 3
+          value: 5
         }
       }
     }
