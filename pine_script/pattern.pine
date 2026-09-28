@@ -1,0 +1,577 @@
+//@version=6
+indicator("SQVIGU Encyclopedia of Chart Patterns", shorttitle="SQVIGU Chart Patterns", overlay=true, max_lines_count=500, max_labels_count=500, max_boxes_count=500, max_bars_back=500)
+
+// ============================================================================
+// 1. INPUT DECLARATIONS
+// ============================================================================
+grpPat   = "Pattern Detection"
+grpVis   = "Visual Appearance"
+grpInfo  = "Information Panel"
+
+showHS   = input.bool(true, "Head and Shoulders", group=grpPat)
+showIHS  = input.bool(true, "Inverse H and S", group=grpPat)
+showDT   = input.bool(true, "Double Top", group=grpPat)
+showDB   = input.bool(true, "Double Bottom", group=grpPat)
+showTT   = input.bool(true, "Triple Top", group=grpPat)
+showTB   = input.bool(true, "Triple Bottom", group=grpPat)
+showSymT = input.bool(true, "Symmetrical Triangle", group=grpPat)
+showAscT = input.bool(true, "Ascending Triangle", group=grpPat)
+showDesT = input.bool(true, "Descending Triangle", group=grpPat)
+showRW   = input.bool(true, "Rising Wedge", group=grpPat)
+showFW   = input.bool(true, "Falling Wedge", group=grpPat)
+showBF   = input.bool(true, "Bull/Bear Flags", group=grpPat)
+showRect = input.bool(true, "Rectangle", group=grpPat)
+
+pivotLeft   = input.int(5, "Pivot Left Bars", minval=2, maxval=20, group=grpPat)
+pivotRight  = input.int(5, "Pivot Right Bars", minval=2, maxval=20, group=grpPat)
+useAdaptive = input.bool(true, "Use ATR Adaptive Pivots", group=grpPat)
+atrAdaptLen = input.int(14, "ATR Adapt Period", minval=5, maxval=50, group=grpPat)
+atrAdaptMult= input.float(1.5, "ATR Adapt Multiplier", minval=0.5, maxval=5.0, step=0.1, group=grpPat)
+minSwingATR = input.float(0.5, "Min Swing (x ATR)", minval=0.1, maxval=3.0, step=0.1, group=grpPat)
+
+symTol      = input.float(1.5, "Symmetry Tolerance %", minval=0.5, maxval=5.0, step=0.1, group=grpPat) / 100.0
+minPatBars  = input.int(10, "Min Pattern Bars", minval=5, maxval=100, group=grpPat)
+maxPatBars  = input.int(120, "Max Pattern Bars", minval=20, maxval=300, group=grpPat)
+
+bullColor     = input.color(color.new(color.green, 30), "Bullish Color", group=grpVis)
+bearColor     = input.color(color.new(color.red, 30), "Bearish Color", group=grpVis)
+neutColor     = input.color(color.new(color.gray, 50), "Neutral Color", group=grpVis)
+lineTrans     = input.int(30, "Line Transparency", minval=0, maxval=100, group=grpVis)
+showTargets   = input.bool(true, "Show Targets", group=grpVis)
+showStops     = input.bool(true, "Show Stops", group=grpVis)
+maxPatDraw    = input.int(3, "Max Active Patterns Displayed", minval=1, maxval=10, group=grpVis)
+
+showPanel     = input.bool(true, "Show Info Panel", group=grpInfo)
+panelPos      = input.string("Top Right", "Panel Position", options=["Top Right","Top Left","Bottom Right","Bottom Left"], group=grpInfo)
+
+// ============================================================================
+// 2. TYPES (Pine Script v6 supports type definitions)
+// ============================================================================
+type PatternResult
+    bool isFound
+    string patId
+    string patName
+    string patBias
+    float reliability
+    int startBar
+    int endBar
+    int confirmBar
+    float entryPrice
+    float stopPrice
+    float target1
+    float target2
+    float neckline
+    int p1bar
+    float p1price
+    int p2bar
+    float p2price
+    int p3bar
+    float p3price
+    int p4bar
+    float p4price
+    int p5bar
+    float p5price
+
+// ============================================================================
+// 3. GLOBALS & SAFE MATH
+// ============================================================================
+var array<float> phPrice = array.new_float(0)
+var array<int>   phBar   = array.new_int(0)
+var array<float> plPrice = array.new_float(0)
+var array<int>   plBar   = array.new_int(0)
+
+var array<line>  allLines  = array.new_line(0)
+var array<label> allLabels = array.new_label(0)
+
+g_atr14 = ta.atr(14)
+g_hh10 = ta.highest(high, 10)
+g_ll10 = ta.lowest(low, 10)
+g_hh20_10 = ta.highest(high, 20)[10]
+g_ll20_10 = ta.lowest(low, 20)[10]
+g_hh30 = ta.highest(high, 30)
+g_ll30 = ta.lowest(low, 30)
+
+avgFloat(float a, float b) => 
+    (a + b) / 2.0
+
+pctDiff(float a, float b) => 
+    avg = avgFloat(a, b)
+    avg > 0 ? math.abs(a - b) / avg : 0.0
+
+trendlineValue(int x1, float y1, int x2, float y2, int targetBar) => 
+    x2 == x1 ? y1 : y1 + (y2 - y1) / (x2 - x1) * (targetBar - x1)
+
+emptyResult() => 
+    PatternResult.new(false, "", "", "", 0.0, 0, 0, 0, 0.0, 0.0, 0.0, 0.0, 0.0, -1, 0.0, -1, 0.0, -1, 0.0, -1, 0.0, -1, 0.0)
+
+// ============================================================================
+// 4. PIVOT ENGINE
+// ============================================================================
+atrVal = ta.atr(atrAdaptLen)
+atrMeanRaw = ta.sma(atrVal, 100)
+atrMeanSafe = na(atrMeanRaw) or atrMeanRaw == 0 ? atrVal : atrMeanRaw
+adaptFactor = useAdaptive and not na(atrMeanSafe) ? math.max(0.5, math.min(3.0, (atrVal / atrMeanSafe) * atrAdaptMult)) : 1.0
+effLeft = math.max(2, int(math.round(pivotLeft * adaptFactor)))
+effRight = math.max(2, int(math.round(pivotRight * adaptFactor)))
+
+ph = ta.pivothigh(high, effLeft, effRight)
+pl = ta.pivotlow(low, effLeft, effRight)
+
+if not na(ph)
+    array.unshift(phPrice, ph)
+    array.unshift(phBar, bar_index - effRight)
+    if array.size(phPrice) > 50
+        array.pop(phPrice)
+        array.pop(phBar)
+
+if not na(pl)
+    array.unshift(plPrice, pl)
+    array.unshift(plBar, bar_index - effRight)
+    if array.size(plPrice) > 50
+        array.pop(plPrice)
+        array.pop(plBar)
+
+var array<float> phPriceF = array.new_float(0)
+var array<int> phBarF = array.new_int(0)
+var array<float> plPriceF = array.new_float(0)
+var array<int> plBarF = array.new_int(0)
+
+array.clear(phPriceF)
+array.clear(phBarF)
+array.clear(plPriceF)
+array.clear(plBarF)
+
+// Filter pivot highs with size safety checks
+if array.size(phPrice) > 0
+    array.push(phPriceF, array.get(phPrice, 0))
+    array.push(phBarF, array.get(phBar, 0))
+    if array.size(phPrice) > 1
+        for i = 1 to array.size(phPrice)-1
+            prevHigh = array.get(phPriceF, array.size(phPriceF)-1)
+            currHigh = array.get(phPrice, i)
+            if atrVal > 0 and math.abs(currHigh - prevHigh) / atrVal >= minSwingATR
+                array.push(phPriceF, currHigh)
+                array.push(phBarF, array.get(phBar, i))
+
+// Filter pivot lows with size safety checks
+if array.size(plPrice) > 0
+    array.push(plPriceF, array.get(plPrice, 0))
+    array.push(plBarF, array.get(plBar, 0))
+    if array.size(plPrice) > 1
+        for i = 1 to array.size(plPrice)-1
+            prevLow = array.get(plPriceF, array.size(plPriceF)-1)
+            currLow = array.get(plPrice, i)
+            if atrVal > 0 and math.abs(currLow - prevLow) / atrVal >= minSwingATR
+                array.push(plPriceF, currLow)
+                array.push(plBarF, array.get(plBar, i))
+
+// ============================================================================
+// 5. PATTERN DETECTION LOGIC
+// ============================================================================
+detectDoubleTop() =>
+    res = emptyResult()
+    if array.size(phPriceF) >= 2 and array.size(plPriceF) >= 1
+        for i = 0 to math.min(8, array.size(phPriceF)-2)
+            h_new = array.get(phPriceF, i)
+            b_new = array.get(phBarF, i)
+            for j = i+1 to math.min(12, array.size(phPriceF)-1)
+                h_old = array.get(phPriceF, j)
+                b_old = array.get(phBarF, j)
+                if (b_new - b_old) >= minPatBars and (b_new - b_old) <= maxPatBars and pctDiff(h_new, h_old) <= symTol
+                    valley = 999999.0
+                    valleyBar = -1
+                    for k = 0 to array.size(plPriceF)-1
+                        lb = array.get(plBarF, k)
+                        lp = array.get(plPriceF, k)
+                        if lb < b_new and lb > b_old and lp < valley
+                            valley := lp
+                            valleyBar := lb
+                    if valleyBar != -1 and (avgFloat(h_new, h_old) - valley) / avgFloat(h_new, h_old) >= 0.005
+                        height = avgFloat(h_new, h_old) - valley
+                        res.isFound := true
+                        res.patId := "DT"
+                        res.patName := "Double Top"
+                        res.patBias := "bearish"
+                        res.reliability := 65.0
+                        res.startBar := b_old
+                        res.endBar := b_new
+                        res.confirmBar := bar_index
+                        res.entryPrice := valley - (height * 0.02)
+                        res.stopPrice := math.max(h_new, h_old) + g_atr14
+                        res.target1 := res.entryPrice - height * 0.61
+                        res.target2 := res.entryPrice - height * 1.618
+                        res.neckline := valley
+                        res.p1bar := b_old
+                        res.p1price := h_old
+                        res.p2bar := valleyBar
+                        res.p2price := valley
+                        res.p3bar := b_new
+                        res.p3price := h_new
+                        break
+            if res.isFound
+                break
+    res
+
+detectDoubleBottom() =>
+    res = emptyResult()
+    if array.size(plPriceF) >= 2 and array.size(phPriceF) >= 1
+        for i = 0 to math.min(8, array.size(plPriceF)-2)
+            l_new = array.get(plPriceF, i)
+            b_new = array.get(plBarF, i)
+            for j = i+1 to math.min(12, array.size(plPriceF)-1)
+                l_old = array.get(plPriceF, j)
+                b_old = array.get(plBarF, j)
+                if (b_new - b_old) >= minPatBars and (b_new - b_old) <= maxPatBars and pctDiff(l_new, l_old) <= symTol
+                    peak = 0.0
+                    peakBar = -1
+                    for k = 0 to array.size(phPriceF)-1
+                        hb = array.get(phBarF, k)
+                        hp = array.get(phPriceF, k)
+                        if hb < b_new and hb > b_old and hp > peak
+                            peak := hp
+                            peakBar := hb
+                    if peakBar != -1 and (peak - avgFloat(l_new, l_old)) / avgFloat(l_new, l_old) >= 0.005
+                        height = peak - avgFloat(l_new, l_old)
+                        res.isFound := true
+                        res.patId := "DB"
+                        res.patName := "Double Bottom"
+                        res.patBias := "bullish"
+                        res.reliability := 70.0
+                        res.startBar := b_old
+                        res.endBar := b_new
+                        res.confirmBar := bar_index
+                        res.entryPrice := peak + (height * 0.02)
+                        res.stopPrice := math.min(l_new, l_old) - g_atr14
+                        res.target1 := res.entryPrice + height * 0.78
+                        res.target2 := res.entryPrice + height * 1.618
+                        res.neckline := peak
+                        res.p1bar := b_old
+                        res.p1price := l_old
+                        res.p2bar := peakBar
+                        res.p2price := peak
+                        res.p3bar := b_new
+                        res.p3price := l_new
+                        break
+            if res.isFound
+                break
+    res
+
+detectHS() =>
+    res = emptyResult()
+    if array.size(phPriceF) >= 3 and array.size(plPriceF) >= 2
+        for i = 0 to math.min(4, array.size(phPriceF)-3)
+            p_new = array.get(phPriceF, i)
+            b_new = array.get(phBarF, i) 
+            for j = i+1 to math.min(6, array.size(phPriceF)-2)
+                p_mid = array.get(phPriceF, j)
+                b_mid = array.get(phBarF, j) 
+                for k = j+1 to math.min(8, array.size(phPriceF)-1)
+                    p_old = array.get(phPriceF, k)
+                    b_old = array.get(phBarF, k)
+                    if p_mid > p_new and p_mid > p_old and pctDiff(p_new, p_old) <= symTol
+                        if (b_new - b_old) >= minPatBars and (b_new - b_old) <= maxPatBars
+                            v1 = 999999.0
+                            vb1 = -1
+                            v2 = 999999.0
+                            vb2 = -1
+                            for li = 0 to array.size(plPriceF)-1
+                                lb = array.get(plBarF, li)
+                                lp = array.get(plPriceF, li)
+                                if lb < b_new and lb > b_mid and lp < v2
+                                    v2 := lp
+                                    vb2 := lb
+                                if lb < b_mid and lb > b_old and lp < v1
+                                    v1 := lp
+                                    vb1 := lb
+                            if vb1 != -1 and vb2 != -1 and pctDiff(v1, v2) <= symTol
+                                neck = trendlineValue(vb1, v1, vb2, v2, bar_index)
+                                height = p_mid - avgFloat(v1, v2)
+                                res.isFound := true
+                                res.patId := "HS"
+                                res.patName := "Head & Shoulders"
+                                res.patBias := "bearish"
+                                res.reliability := 75.0
+                                res.startBar := b_old
+                                res.endBar := b_new
+                                res.confirmBar := bar_index
+                                res.entryPrice := neck * 0.995
+                                res.stopPrice := math.max(p_new, math.max(p_mid, p_old)) + g_atr14
+                                res.target1 := res.entryPrice - height * 0.62
+                                res.target2 := res.entryPrice - height * 1.618
+                                res.neckline := neck
+                                res.p1bar := b_old
+                                res.p1price := p_old
+                                res.p2bar := vb1
+                                res.p2price := v1
+                                res.p3bar := b_mid
+                                res.p3price := p_mid
+                                res.p4bar := vb2
+                                res.p4price := v2
+                                res.p5bar := b_new
+                                res.p5price := p_new
+                                break
+                if res.isFound
+                    break
+            if res.isFound
+                break
+    res
+
+detectIHS() =>
+    res = emptyResult()
+    if array.size(plPriceF) >= 3 and array.size(phPriceF) >= 2
+        for i = 0 to math.min(4, array.size(plPriceF)-3)
+            p_new = array.get(plPriceF, i)
+            b_new = array.get(plBarF, i) 
+            for j = i+1 to math.min(6, array.size(plPriceF)-2)
+                p_mid = array.get(plPriceF, j)
+                b_mid = array.get(plBarF, j) 
+                for k = j+1 to math.min(8, array.size(plPriceF)-1)
+                    p_old = array.get(plPriceF, k)
+                    b_old = array.get(plBarF, k)
+                    if p_mid < p_new and p_mid < p_old and pctDiff(p_new, p_old) <= symTol
+                        if (b_new - b_old) >= minPatBars and (b_new - b_old) <= maxPatBars
+                            v1 = 0.0
+                            vb1 = -1
+                            v2 = 0.0
+                            vb2 = -1
+                            for hi = 0 to array.size(phPriceF)-1
+                                hb = array.get(phBarF, hi)
+                                hp = array.get(phPriceF, hi)
+                                if hb < b_new and hb > b_mid and hp > v2
+                                    v2 := hp
+                                    vb2 := hb
+                                if hb < b_mid and hb > b_old and hp > v1
+                                    v1 := hp
+                                    vb1 := hb
+                            if vb1 != -1 and vb2 != -1 and pctDiff(v1, v2) <= symTol
+                                neck = trendlineValue(vb1, v1, vb2, v2, bar_index)
+                                height = avgFloat(v1, v2) - p_mid
+                                res.isFound := true
+                                res.patId := "IHS"
+                                res.patName := "Inv Head & Shoulders"
+                                res.patBias := "bullish"
+                                res.reliability := 85.0
+                                res.startBar := b_old
+                                res.endBar := b_new
+                                res.confirmBar := bar_index
+                                res.entryPrice := neck * 1.005
+                                res.stopPrice := math.min(p_new, math.min(p_mid, p_old)) - g_atr14
+                                res.target1 := res.entryPrice + height * 0.82
+                                res.target2 := res.entryPrice + height * 1.618
+                                res.neckline := neck
+                                res.p1bar := b_old
+                                res.p1price := p_old
+                                res.p2bar := vb1
+                                res.p2price := v1
+                                res.p3bar := b_mid
+                                res.p3price := p_mid
+                                res.p4bar := vb2
+                                res.p4price := v2
+                                res.p5bar := b_new
+                                res.p5price := p_new
+                                break
+                if res.isFound
+                    break
+            if res.isFound
+                break
+    res
+
+detectSymTriangle() =>
+    res = emptyResult()
+    if array.size(phPriceF) >= 2 and array.size(plPriceF) >= 2
+        h_new = array.get(phPriceF, 0)
+        hb_new = array.get(phBarF, 0)
+        h_old = array.get(phPriceF, 1)
+        hb_old = array.get(phBarF, 1)
+        l_new = array.get(plPriceF, 0)
+        lb_new = array.get(plBarF, 0)
+        l_old = array.get(plPriceF, 1)
+        lb_old = array.get(plBarF, 1)
+        
+        if h_new < h_old and l_new > l_old 
+            dur = math.max(hb_new, lb_new) - math.min(hb_old, lb_old)
+            if dur >= minPatBars and dur <= maxPatBars
+                center = avgFloat(h_new, l_new)
+                bias = close > center ? "bullish" : "bearish"
+                height = h_old - l_old
+                res.isFound := true
+                res.patId := "SYM"
+                res.patName := "Symmetrical Triangle"
+                res.patBias := bias
+                res.reliability := 55.0
+                res.startBar := math.min(hb_old, lb_old)
+                res.endBar := math.max(hb_new, lb_new)
+                res.confirmBar := bar_index
+                res.entryPrice := bias == "bullish" ? h_new + g_atr14*0.2 : l_new - g_atr14*0.2
+                res.stopPrice := bias == "bullish" ? l_new - g_atr14 : h_new + g_atr14
+                res.target1 := bias == "bullish" ? res.entryPrice + height*0.58 : res.entryPrice - height*0.58
+                res.neckline := center
+                res.p1bar := hb_old
+                res.p1price := h_old
+                res.p2bar := lb_old
+                res.p2price := l_old
+                res.p3bar := hb_new
+                res.p3price := h_new
+                res.p4bar := lb_new
+                res.p4price := l_new
+    res
+
+detectFlags(bool isBull) =>
+    res = emptyResult()
+    poleStart = isBull ? g_ll20_10 : g_hh20_10
+    poleEnd   = isBull ? g_hh10 : g_ll10
+    poleSize  = math.abs(poleEnd - poleStart)
+    consHigh  = g_hh10
+    consLow   = g_ll10
+    if poleSize > 0 and (consHigh - consLow) / poleSize < 0.5
+        res.isFound := true
+        res.patId := isBull ? "BF" : "BeF"
+        res.patName := isBull ? "Bull Flag" : "Bear Flag"
+        res.patBias := isBull ? "bullish" : "bearish"
+        res.reliability := 70.0
+        res.startBar := bar_index - 30
+        res.endBar := bar_index
+        res.confirmBar := bar_index
+        res.entryPrice := isBull ? consHigh + g_atr14*0.2 : consLow - g_atr14*0.2
+        res.stopPrice := isBull ? consLow - g_atr14 : consHigh + g_atr14
+        res.target1 := isBull ? res.entryPrice + poleSize * 0.85 : res.entryPrice - poleSize * 0.72
+        res.neckline := avgFloat(consHigh, consLow)
+        res.p1bar := bar_index-30
+        res.p1price := poleStart
+        res.p2bar := bar_index-10
+        res.p2price := poleEnd
+        res.p3bar := bar_index
+        res.p3price := close
+    res
+
+detectRectangle() =>
+    res = emptyResult()
+    rectRange = g_hh30 - g_ll30
+    mid = avgFloat(g_hh30, g_ll30)
+    if rectRange > 0 and rectRange / close >= 0.015
+        bias = close > mid ? "bullish" : "bearish"
+        res.isFound := true
+        res.patId := "RECT"
+        res.patName := "Rectangle"
+        res.patBias := bias
+        res.reliability := 55.0
+        res.startBar := bar_index - 30
+        res.endBar := bar_index
+        res.confirmBar := bar_index
+        res.entryPrice := bias == "bullish" ? g_hh30 + g_atr14*0.2 : g_ll30 - g_atr14*0.2
+        res.stopPrice := bias == "bullish" ? g_ll30 - g_atr14 : g_hh30 + g_atr14
+        res.target1 := bias == "bullish" ? res.entryPrice + rectRange * 0.60 : res.entryPrice - rectRange * 0.60
+        res.neckline := mid
+        res.p1bar := bar_index-30
+        res.p1price := g_hh30
+        res.p2bar := bar_index-15
+        res.p2price := mid
+        res.p3bar := bar_index
+        res.p3price := g_ll30
+    res
+
+// ============================================================================
+// 8. DASHBOARD TABLE INITIALIZATION
+// ============================================================================
+var table infoTbl = table.new(position.top_right, 2, 7, bgcolor=color.new(color.black, 70), frame_width=1, frame_color=color.gray)
+if barstate.isfirst
+    pos = position.top_right
+    if panelPos == "Top Left"
+        pos := position.top_left
+    else if panelPos == "Bottom Right"
+        pos := position.bottom_right
+    else if panelPos == "Bottom Left"
+        pos := position.bottom_left
+    table.set_position(infoTbl, pos)
+
+// ============================================================================
+// 9. MAIN EXECUTION
+// ============================================================================
+if barstate.islast
+    if array.size(allLines) > 0
+        for i = array.size(allLines) - 1 to 0
+            line.delete(array.get(allLines, i))
+        array.clear(allLines)
+        
+    if array.size(allLabels) > 0
+        for i = array.size(allLabels) - 1 to 0
+            label.delete(array.get(allLabels, i))
+        array.clear(allLabels)
+
+    patterns = array.new<PatternResult>()
+    
+    if showDT
+        dt = detectDoubleTop()
+        if dt.isFound
+            array.push(patterns, dt)
+    if showDB
+        db = detectDoubleBottom()
+        if db.isFound
+            array.push(patterns, db)
+    if showHS
+        hs = detectHS()
+        if hs.isFound
+            array.push(patterns, hs)
+    if showIHS
+        ihs = detectIHS()
+        if ihs.isFound
+            array.push(patterns, ihs)
+    if showSymT
+        sym = detectSymTriangle()
+        if sym.isFound
+            array.push(patterns, sym)
+    if showBF
+        bf = detectFlags(true)
+        if bf.isFound
+            array.push(patterns, bf)
+        bef = detectFlags(false)
+        if bef.isFound
+            array.push(patterns, bef)
+    if showRect
+        rect = detectRectangle()
+        if rect.isFound
+            array.push(patterns, rect)
+            
+    if array.size(patterns) > 0
+        limit = math.min(array.size(patterns) - 1, maxPatDraw - 1)
+        for i = 0 to limit
+            p = array.get(patterns, i)
+            col = p.patBias == "bullish" ? bullColor : p.patBias == "bearish" ? bearColor : neutColor
+            c = color.new(col, lineTrans)
+            
+            if p.p1bar != -1 and p.p2bar != -1
+                array.push(allLines, line.new(p.p1bar, p.p1price, p.p2bar, p.p2price, color=c, width=2))
+            if p.p2bar != -1 and p.p3bar != -1
+                array.push(allLines, line.new(p.p2bar, p.p2price, p.p3bar, p.p3price, color=c, width=2))
+            if p.p3bar != -1 and p.p4bar != -1
+                array.push(allLines, line.new(p.p3bar, p.p3price, p.p4bar, p.p4price, color=c, width=2))
+            if p.p4bar != -1 and p.p5bar != -1
+                array.push(allLines, line.new(p.p4bar, p.p4price, p.p5bar, p.p5price, color=c, width=2))
+                
+            if p.neckline > 0
+                array.push(allLines, line.new(p.startBar, p.neckline, bar_index+10, p.neckline, color=color.new(col, lineTrans+20), style=line.style_dashed))
+                
+            if showTargets and p.entryPrice > 0
+                array.push(allLines, line.new(p.confirmBar, p.entryPrice, bar_index+5, p.entryPrice, color=color.new(color.blue, lineTrans), style=line.style_dashed))
+                array.push(allLabels, label.new(bar_index+2, p.entryPrice, "Entry", color=color.new(color.blue, 100), textcolor=color.blue, style=label.style_none))
+                
+            if showStops and p.stopPrice > 0
+                array.push(allLines, line.new(p.confirmBar, p.stopPrice, bar_index+5, p.stopPrice, color=color.new(color.red, lineTrans), style=line.style_dotted))
+                
+            lblText = p.patName + "\n" + p.patBias + "\nRel: " + str.tostring(p.reliability) + "%"
+            array.push(allLabels, label.new(p.endBar, p.p1price, lblText, color=c, textcolor=color.white, style=p.patBias=="bullish" ? label.style_label_up : label.style_label_down))
+
+        bestP = array.get(patterns, 0)
+        if showPanel
+            table.cell(infoTbl, 0, 0, "ACTIVE PATTERN", text_color=color.gray, text_size=size.tiny)
+            table.cell(infoTbl, 1, 0, bestP.patName, text_color=color.white, text_size=size.small)
+            table.cell(infoTbl, 0, 1, "Direction", text_color=color.gray, text_size=size.tiny)
+            table.cell(infoTbl, 1, 1, bestP.patBias, text_color=bestP.patBias=="bullish"?color.green:color.red, text_size=size.small)
+            table.cell(infoTbl, 0, 2, "Entry Trigger", text_color=color.gray, text_size=size.tiny)
+            table.cell(infoTbl, 1, 2, str.tostring(bestP.entryPrice, format.mintick), text_color=color.blue, text_size=size.small)
+            table.cell(infoTbl, 0, 3, "Stop Loss", text_color=color.gray, text_size=size.tiny)
+            table.cell(infoTbl, 1, 3, str.tostring(bestP.stopPrice, format.mintick), text_color=color.red, text_size=size.small)
+            table.cell(infoTbl, 0, 4, "Target (TP1)", text_color=color.gray, text_size=size.tiny)
+            table.cell(infoTbl, 1, 4, str.tostring(bestP.target1, format.mintick), text_color=color.green, text_size=size.small)
+            table.cell(infoTbl, 0, 5, "Reliability", text_color=color.gray, text_size=size.tiny)
+            table.cell(infoTbl, 1, 5, str.tostring(bestP.reliability) + "%", text_color=color.orange, text_size=size.small)

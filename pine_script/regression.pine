@@ -1,0 +1,85 @@
+//@version=6
+indicator("Regression Z-Score + Line (Dual Pane)", overlay=false, precision=2)
+
+// --- Inputs ---
+regLength   = input.int(55, "Regression Length", minval=5)
+src         = input.source(close, "Source")
+showBands   = input.bool(true, "Show StdDev Bands on Price")
+bandMult    = input.float(2.0, "Band Multiplier", step=0.1)
+obLevel     = input.float(2.0, "Overbought", step=0.1)
+osLevel     = input.float(-2.0, "Oversold", step=0.1)
+
+// =========================================================
+// PART 1 — PRICE PANE (Regression Line + Bands)
+// =========================================================
+
+// Linear regression
+linReg = ta.linreg(src, regLength, 0)
+
+// Residuals and std dev (same window)
+residual = src - linReg
+stdDev   = ta.stdev(residual, regLength)
+
+// Bands
+upperBand = linReg + bandMult * stdDev
+lowerBand = linReg - bandMult * stdDev
+
+// Plot regression line on PRICE chart
+plot(linReg, "Regression Line", color=color.new(color.orange, 0), linewidth=2, force_overlay=true)
+
+// Plot bands on PRICE chart
+plot(showBands ? upperBand : na, "Upper Band", color=color.new(color.red, 40), linewidth=1, force_overlay=true)
+plot(showBands ? lowerBand : na, "Lower Band", color=color.new(color.green, 40), linewidth=1, force_overlay=true)
+
+// Fill between bands
+fill(plot(showBands ? upperBand : na, display=display.none, force_overlay=true),
+     plot(showBands ? lowerBand : na, display=display.none, force_overlay=true),
+     color=color.new(color.gray, 92), title="Band Fill")
+
+// =========================================================
+// PART 2 — OSCILLATOR PANE (Z-Score)
+// =========================================================
+
+// Z-score
+zScore = stdDev != 0 ? residual / stdDev : 0.0
+
+// Pearson R + direction
+pearsonR      = ta.correlation(src, linReg, regLength)
+trendDir      = linReg > linReg[1] ? "Up" : "Down"
+trendStrength = math.abs(pearsonR) > 0.85 ? "Strong" : math.abs(pearsonR) > 0.5 ? "Moderate" : "Weak/Choppy"
+
+// Plot Z-score (stays in indicator pane)
+plot(zScore, "Z-Score", color=color.blue, linewidth=2)
+hline(0, "Zero", color=color.gray)
+hline(obLevel, "OB", color=color.red, linestyle=hline.style_dashed)
+hline(osLevel, "OS", color=color.green, linestyle=hline.style_dashed)
+hline(-obLevel, "Extreme Low", color=color.new(color.green, 50), linestyle=hline.style_dotted)
+hline(obLevel * 1.5, "Extreme High", color=color.new(color.red, 50), linestyle=hline.style_dotted)
+
+// Background shading for extremes
+bgcolor(math.abs(zScore) > 2.5 ? color.new(color.yellow, 90) : na)
+
+// =========================================================
+// PART 3 — INFO TABLE
+// =========================================================
+var table info = table.new(position.top_right, 2, 4, border_width=1)
+if barstate.islast
+    table.cell(info, 0, 0, "Pearson R", bgcolor=color.gray, text_color=color.white)
+    table.cell(info, 1, 0, str.tostring(pearsonR, "#.###"),
+         bgcolor=math.abs(pearsonR) > 0.85 ? color.green : color.red, text_color=color.white)
+
+    table.cell(info, 0, 1, "Direction", bgcolor=color.gray, text_color=color.white)
+    table.cell(info, 1, 1, trendDir,
+         bgcolor=trendDir == "Up" ? color.green : color.red, text_color=color.white)
+
+    table.cell(info, 0, 2, "Strength", bgcolor=color.gray, text_color=color.white)
+    table.cell(info, 1, 2, trendStrength, bgcolor=color.blue, text_color=color.white)
+
+    table.cell(info, 0, 3, "Z-Score", bgcolor=color.gray, text_color=color.white)
+    table.cell(info, 1, 3, str.tostring(zScore, "#.##"), bgcolor=color.blue, text_color=color.white)
+
+// =========================================================
+// PART 4 — ALERTS
+// =========================================================
+alertcondition(ta.crossover(zScore, osLevel),  "Z Crossed Above Oversold",  "Bullish pullback signal")
+alertcondition(ta.crossunder(zScore, obLevel), "Z Crossed Below Overbought", "Bearish reversal signal")

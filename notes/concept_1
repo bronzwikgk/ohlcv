@@ -1,0 +1,33 @@
+- A system, that can help us, first
+    - build
+    - validate and test
+    - implement,
+    algo trading strategy.
+
+- Rules for defining,
+    - Groups as per regime
+        - returns
+            - Momemtum of returns
+        - standard deviation of return
+            - Momemtum
+
+- Metrics
+    - Number of stocks,
+    - Number of trades 
+    - Number of trades per annum.
+    - Avg return per annums
+    - Avg Return per trade
+    - Expentency
+    - Winrate
+        - Target Hit
+        - Avg Draw down 
+
+
+- Ideas:
+    - strategy
+        - We develop strategy around skwed W formation, where first lower low is lower than second lower low, second lower low is called hl. We find the differant returns on the basis of shape of the w, like distance between LL and peak and then peak and HL, slope or differance between ll and hl. and pick our trade acordingly. 
+    - During testing use
+        - Smaller time frame RSI or any other indicator for exit.
+        - 
+
+
