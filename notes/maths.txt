@@ -1,0 +1,25 @@
+- Problem Statement:
+    - Stock behavior is noisy,  
+    Difficult ot make
+- Linear Regression:
+- standard deviation:
+- Standard Error:
+    - For back testing results, via sharpe ratio.
+- Pivots:
+    - Point of change. Used a point of interest for building shapes and startegy.
+
+The Volatility Ratio (Using Standard Deviation)
+The Math: Short-Term SD (e.g., 21 days) / Long-Term SD (e.g., 100 days)
+
+This ratio measures Volatility Expansion vs. Compression. It tells you if the stock's recent price swings are getting wider or tighter compared to its normal historical baseline.
+
+Ratio < 0.6 (The "Coiled Spring" / Squeeze): The short-term volatility is unusually low compared to its history. The stock is tightly consolidating. This behavior signature usually precedes a massive, explosive breakout.
+Ratio ≈ 1.0 (The "Steady Grinder"): The current volatility matches the historical baseline. The stock is behaving exactly as it normally does, making it highly predictable for trend-following.
+Ratio > 1.5 (The "Exhaustion" / Erratic Climber): The short-term volatility is significantly higher than normal. The price action has become violent and erratic. This signature often indicates a climax top, panic selling, or a highly chaotic battle between buyers and sellers where stop-losses are easily hunted.
+2. The Confidence Ratio (Using Standard Error)
+The Math: Short-Term SE / Long-Term SE (Note: In trading, SE is best applied to the slope of a Linear Regression trendline, which measures the "noise" or "error" around the trend).
+
+This ratio measures Trend Cleanliness and Conviction. It tells you if the recent trend is highly organized and mathematical, or if it is just a messy byproduct of random noise.
+
+Ratio < 0.5 (The "Institutional Channel"): The short-term error is much lower than the long-term error. The recent price action is extremely clean, hugging the trendline perfectly with very little noise. This implies strong, calculated institutional accumulation or distribution.
+Ratio > 1.5 (The "Retail Chop"): The short-term error is much higher than the long-term error. Even if the stock is technically going up, it is bouncing wildly around the trendline. The trend lacks conviction and is driven by emotion or thin liquidity.

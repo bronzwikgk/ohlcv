@@ -1,5 +1,8 @@
 - A system, that can help us, first
+
     - build
+        - Behaviour classificaiton of 
+            - Direction and Confidence in Direction, indicating trend. 
     - validate and test
     - implement,
     algo trading strategy.

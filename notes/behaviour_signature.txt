@@ -1,0 +1,9 @@
+- Attributes
+    - trend
+        - Direction
+        - Magnitude of trend:
+        - Standard Deviation:
+        - Trend vs chop: R2
+        - Trend Reliability: T-stat
+        - Trend Stability: Rolling change of in Slope.
+        - Noise Size : Std of Residual.
