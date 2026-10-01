@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingView Style - Behavioural Classification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="drawer-backdrop" class="drawer-backdrop"></div>
+    <aside id="app-drawer" class="app-drawer">
+        <header class="drawer-header">
+            <h2>Workspace</h2>
+            <button id="close-drawer" class="btn-icon danger">✕</button>
+        </header>
+        <div class="drawer-content">
+            <section class="drawer-section">
+                <h3>Mode</h3>
+                <div class="mode-toggle">
+                    <button class="active">📈 Charting</button>
+                    <button>🔍 Screener</button>
+                </div>
+            </section>
+            <section class="drawer-section">
+                <h3>Manage</h3>
+                <button id="btn-workspace-new" class="drawer-btn">➕ New Blank</button>
+                <button id="btn-workspace-open" class="drawer-btn" style="display: none;">📂 Open (.json)</button>
+                <button id="btn-workspace-export" class="drawer-btn">💾 Export Template</button>
+            </section>
+            <section class="drawer-section">
+                <h3>Saved Templates</h3>
+                <ul id="template-list-container" class="template-list">
+                    <!-- Populated dynamically -->
+                </ul>
+            </section>
+        </div>
+    </aside>
+
+    <header>
+        <button id="brand-toggle" class="brand-button" title="Open Workspace Menu">
+            <span class="hamburger">☰</span> ohlcv_app
+        </button>
+
+        <details>
+            <summary>Tickers</summary>
+            <form id="dropdown-tickers" class="dropdown-menu">
+                <div class="bulk-actions" style="display: flex; justify-content: space-between; padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--border-color); margin-bottom: var(--spacing-sm);">
+                    <button type="button" class="btn-select-all" style="background: none; border: none; color: var(--accent); cursor: pointer; font-size: 11px;">Select All</button>
+                    <button type="button" class="btn-deselect-all" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px;">Clear</button>
+                </div>
+                <input type="search" placeholder="Search...">
+                <div id="ticker-list-container"></div>
+            </form>
+        </details>
+
+        <details>
+            <summary>Derivatives</summary>
+            <form id="dropdown-derivatives" class="dropdown-menu">
+                <div class="bulk-actions" style="display: flex; justify-content: space-between; padding: var(--spacing-sm) var(--spacing-md); border-bottom: 1px solid var(--border-color); margin-bottom: var(--spacing-sm);">
+                    <button type="button" class="btn-select-all" style="background: none; border: none; color: var(--accent); cursor: pointer; font-size: 11px;">Select All</button>
+                    <button type="button" class="btn-deselect-all" style="background: none; border: none; color: var(--text-muted); cursor: pointer; font-size: 11px;">Clear</button>
+                </div>
+                <input type="search" placeholder="Search...">
+                <!-- Injected via JS -->
+            </form>
+        </details>
+    </header>
+
+    <main>
+        <article id="main-chart-container" class="workspace-grid">
+            <!-- Dynamically populated by app.js -->
+        </article>
+    </main>
+
+
+    <script src="../library/lightweight-charts.standalone.production.js"></script>
+    <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+- We need a input form, where user can define its data source.
+- For eg 
+    - Data Source: Drop Down
+        - Yahoo Finance
+        - Free api Source
+        - Mstock
+        - Angle One
+        

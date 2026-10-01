@@ -1,0 +1,205 @@
+# Interpreting Linear Regression, Std Dev & Std Error for Stock Behavior
+
+These three tools together give you a **clean trend signature**. Here's exactly what each tells you.
+
+---
+
+## Setup: The Regression
+
+Fit a line to price over N bars:
+
+```
+Price_t = a + b × t + error_t
+```
+
+- `b` = slope (trend direction & speed)
+- `a` = intercept (starting level)
+- `error_t` = residuals (what the line can't explain)
+
+---
+
+## 1. Slope (b) — Direction & Speed
+
+**What it tells you:** How fast price is moving per bar.
+
+**Interpretation:**
+- b > 0 → uptrend
+- b < 0 → downtrend
+- b ≈ 0 → sideways
+
+**Normalize it:** Divide slope by price → `% move per bar`. Now comparable across stocks.
+
+```
+Normalized slope = b / avg_price
+```
+
+**Use:** Rank stocks by this. Top = strongest uptrend.
+
+---
+
+## 2. R² (R-squared) — Trend Cleanliness
+
+**What it tells you:** How much of price movement the line explains.
+
+**Range:** 0 to 1
+
+| R² | Meaning |
+|---|---|
+| > 0.8 | Clean trend, low noise |
+| 0.5–0.8 | Decent trend |
+| 0.2–0.5 | Weak trend, choppy |
+| < 0.2 | No trend, pure noise/range |
+
+**This is your trending vs sideways detector.**
+
+**Why it works:** R² is high when price hugs the line. It's low when price wiggles around it. Noise kills R² automatically.
+
+**Combine with slope:**
+- High R² + positive slope → **clean uptrend**
+- High R² + negative slope → **clean downtrend**
+- Low R² + any slope → **range / chop**
+
+---
+
+## 3. Standard Deviation of Residuals — Noise Size
+
+**What it tells you:** How far price typically deviates from the trend line.
+
+**Calculate:**
+```
+Residual_t = Price_t − (a + b×t)
+Std_Residual = std(residuals)
+```
+
+**Interpretation:**
+- Small → price sticks to trend (tight)
+- Large → price wanders far from trend (loose)
+
+**Normalize it:**
+```
+Noise ratio = Std_Residual / avg_price
+```
+
+**Use:** Tells you **stop-loss width** and **position size**.
+
+- Tight trend (small noise) → tight stop, bigger position
+- Loose trend (big noise) → wide stop, smaller position
+
+**Key insight:** Slope tells direction. Std_Residual tells how *trustworthy* the path is.
+
+---
+
+## 4. Standard Error of Slope — Trend Reliability
+
+**What it tells you:** How confident you are that the slope is real, not luck.
+
+**Calculate:**
+```
+SE_slope = Std_Residual / sqrt( Σ(t − t_mean)² )
+```
+
+**Interpretation:**
+- Small SE → slope is stable, trust it
+- Large SE → slope is unstable, could flip
+
+**The killer metric — t-statistic:**
+```
+t = slope / SE_slope
+```
+
+| t-value | Meaning |
+|---|---|
+| > 2 | Trend is statistically real |
+| 1–2 | Weak evidence |
+| < 1 | Slope is basically noise |
+
+**This is your "is the trend real?" filter.**
+
+---
+
+## 5. Standard Error of Intercept — Level Confidence
+
+**What it tells you:** How well you know the starting level.
+
+**Rarely useful for trading.** Mostly matters when projecting forward. Skip unless you're forecasting.
+
+---
+
+## Putting It Together: The 4-Number Signature
+
+From one regression, extract:
+
+| # | Metric | Tells You |
+|---|---|---|
+| 1 | Normalized slope | Direction + speed |
+| 2 | R² | Trending or ranging |
+| 3 | Normalized Std_Residual | Noise size (stop width) |
+| 4 | t-stat of slope | Is the trend real? |
+
+**That's it.** Four numbers. Fully comparable across stocks.
+
+---
+
+## Decision Table
+
+| Slope | R² | t-stat | Meaning | Action |
+|---|---|---|---|---|
+| + | High | >2 | Clean uptrend | Long, tight stop |
+| + | Low | <2 | Weak drift in noise | Skip or scale small |
+| + | High | >2 | Clean uptrend | Long |
+| − | High | >2 | Clean downtrend | Short |
+| Any | Low | <2 | Range / chop | Range trade or avoid |
+| + | Med | >2 | Grinding uptrend | Long, wide stop |
+
+---
+
+## Multi-Timeframe Extension
+
+Run the same regression on 3 windows:
+
+```
+Short (20 bars):  slope_s, R²_s, noise_s, t_s
+Medium (60 bars): slope_m, R²_m, noise_m, t_m
+Long (200 bars):  slope_l, R²_l, noise_l, t_l
+```
+
+**Read the pattern:**
+
+| Short | Long | Meaning |
+|---|---|---|
+| High R², +slope | High R², +slope | Aligned uptrend — best trade |
+| High R², +slope | Low R² | Short-term pop in range — fade |
+| Low R² | High R², +slope | Pullback in uptrend — buy dip |
+| Low R² | Low R² | Dead — avoid |
+
+This is how you solve the fractal problem **with regression instead of ER**.
+
+---
+
+## Why Regression Beats Simple Slope
+
+- **Simple slope** ignores noise → false signals
+- **Regression slope** accounts for noise via SE
+- **R²** separates trend from chop automatically
+- **t-stat** filters luck from real trends
+- **Residual std** gives you stop size directly
+
+One regression → **four tradeable numbers.** No clustering, no arbitrary buckets.
+
+---
+
+## Critical Rules
+
+1. **Always normalize** slope and residual std by price → comparable across stocks.
+2. **Use log prices** for long windows → slope becomes % return per bar.
+3. **R² is your trend filter** — nothing else needed to separate trending from sideways.
+4. **t-stat > 2 is your entry gate** — don't trade unconfirmed slopes.
+5. **Residual std is your stop-loss** — set stop at 2× residual std from the line.
+
+---
+
+## One-Line Summary
+
+**Slope = direction & speed. R² = trend vs noise. Std of residuals = how wide the noise is (stop size). Std error / t-stat = is the trend real. Four numbers from one regression replace your entire classification system.**
+
+Run this on 3 timeframes and you have a complete, noise-robust, fractal-aware signature.

@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TradingView Style - Behavioural Classification</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Global Tokens & TradingView Theme */
+        :root {
+            --bg-base: #f0f3fa;
+            /* Slightly darker grey/blue for main background */
+            --bg-panel: #ffffff;
+            /* Crisp white for panels */
+            --bg-hover: #f8f9fa;
+            --bg-input: #ffffff;
+            --text-main: #131722;
+            --text-muted: #787b86;
+            --border-color: #d1d4dc;
+            /* Slightly darker border for contrast */
+            --accent: #2962ff;
+            --accent-hover: #1e53e5;
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Trebuchet MS", Roboto, Ubuntu, sans-serif;
+
+            --spacing-xs: 2px;
+            --spacing-sm: 4px;
+            --spacing-md: 8px;
+            --spacing-lg: 12px;
+
+            --font-size-sm: 11px;
+            --font-size-md: 13px;
+        }
+
+        /* Hard Reset */
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-family);
+            font-size: var(--font-size-md);
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            /* App-like feel */
+
+            /* Enhanced Font Smoothing */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+        }
+
+        /* Top Toolbar */
+        header {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            background: var(--bg-panel);
+            padding: var(--spacing-sm) var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            height: 40px;
+            flex-shrink: 0;
+        }
+
+        /* Native Details Dropdowns used as Toolbars items */
+        header>details {
+            position: relative;
+            display: flex;
+            height: 100%;
+            align-items: center;
+        }
+
+        header>details>summary {
+            cursor: pointer;
+            font-weight: 500;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 4px;
+            user-select: none;
+        }
+
+        header>details>summary:hover {
+            background: var(--bg-hover);
+        }
+
+        header>details>summary::-webkit-details-marker {
+            display: none;
+        }
+
+        header>details>summary::after {
+            content: '▼';
+            font-size: 8px;
+            color: var(--text-muted);
+        }
+
+        /* Dropdown Panel */
+        header>details>form {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            max-height: 50vh;
+            width: max-content;
+            overflow-y: auto;
+            overflow-x: hidden;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            padding: var(--spacing-sm);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            margin-top: 4px;
+        }
+
+        header>details>form>input[type="search"] {
+            background: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            border-radius: 3px;
+            padding: var(--spacing-sm) var(--spacing-md);
+            margin-bottom: var(--spacing-sm);
+            font-size: var(--font-size-md);
+            outline: none;
+        }
+
+        header>details>form>input[type="search"]:focus {
+            border-color: var(--accent);
+        }
+
+        header>details>form>label {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-md);
+            padding: var(--spacing-sm) var(--spacing-md);
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: var(--font-size-md);
+            white-space: nowrap;
+        }
+
+        header>details>form>label:hover {
+            background: var(--bg-hover);
+        }
+
+        /* ToolBar Button */
+        header>button {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 3px;
+            padding: 4px 12px;
+            font-size: var(--font-size-md);
+            cursor: pointer;
+            font-weight: 500;
+            margin-left: auto;
+            /* Push to right */
+            height: 24px;
+            display: flex;
+            align-items: center;
+        }
+
+        header>button:hover {
+            background: var(--accent-hover);
+        }
+
+        /* Workspace Main Area */
+        main {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+            overflow-y: auto;
+            /* Scrollable list of stock charts */
+            padding: var(--spacing-xs);
+        }
+
+        main>article {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-xs);
+            /* Minimal gaps between stocks */
+        }
+
+        main>article>ul {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            background: var(--bg-panel);
+            border: 1px solid var(--border-color);
+            border-radius: 2px;
+        }
+
+        /* Stock Row Header (Collapsible) */
+        main>article>ul>details>summary {
+            background: var(--bg-base);
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-weight: 600;
+            color: var(--text-main);
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            user-select: none;
+        }
+
+        main>article>ul>details>summary::-webkit-details-marker {
+            display: none;
+        }
+
+        main>article>ul>details>summary::before {
+            content: '▶';
+            font-size: 8px;
+            color: var(--text-muted);
+            margin-right: var(--spacing-md);
+        }
+
+        main>article>ul>details[open]>summary::before {
+            content: '▼';
+        }
+
+        main>article>ul>details>summary:hover {
+            background: var(--bg-hover);
+        }
+
+        /* Individual Chart Panels inside Stock */
+        main>article>ul>details>li {
+            display: flex;
+            flex-direction: column;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        main>article>ul>details>li:last-child {
+            border-bottom: none;
+        }
+
+        /* Panel Title */
+        main>article>ul>details>li>header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: var(--font-size-sm);
+            color: var(--text-muted);
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        /* Panel Controls */
+        .panel-controls {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-icon:hover {
+            background-color: var(--bg-hover);
+            color: var(--text-main);
+        }
+
+        .btn-icon.danger:hover {
+            background-color: #ffebee;
+            color: #d32f2f;
+        }
+
+        /* Hideable Property Inspector */
+        .property-inspector {
+            display: none;
+            background-color: var(--bg-hover);
+            border-bottom: 1px solid var(--border-color);
+            padding: var(--spacing-sm) var(--spacing-md);
+            font-size: 12px;
+            color: var(--text-main);
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+            text-transform: none;
+            font-weight: normal;
+        }
+
+        .property-inspector.active {
+            display: flex;
+        }
+
+        .inspector-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .inspector-group select,
+        .inspector-group input {
+            padding: 2px 4px;
+            font-size: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            background-color: var(--bg-input);
+        }
+
+        /* The actual plot area */
+        main>article>ul>details>li>section {
+            display: flex;
+            width: 100%;
+            height: 25vh;
+            /* Responsive height based on viewport */
+            min-height: 100px;
+            /* Sensible absolute minimum */
+            background: var(--bg-base);
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            font-size: var(--font-size-sm);
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <details>
+            <summary>Tickers</summary>
+            <form>
+                <input type="search" placeholder="Search...">
+                <div id="ticker-list-container"></div>
+
+
+            </form>
+        </details>
+
+        <details>
+            <summary>1st Order</summary>
+            <form id="dropdown-1st-order">
+                <input type="search" placeholder="Search...">
+                <!-- Injected via JS -->
+            </form>
+        </details>
+
+        <details>
+            <summary>2nd Order</summary>
+            <form id="dropdown-2nd-order">
+                <input type="search" placeholder="Search...">
+                <!-- Injected via JS -->
+            </form>
+        </details>
+
+
+
+        <button>Apply</button>
+    </header>
+
+    <main>
+        <article>
+            <!-- BANKBEES Panel -->
+            <ul>
+                <details open>
+                    <summary>BANKBEES</summary>
+
+                    <li>
+                        <header>
+                            <span>Price Action</span>
+                            <div class="panel-controls">
+                                <button class="btn-icon" title="Settings"
+                                    onclick="this.closest('li').querySelector('.property-inspector').classList.toggle('active')">⚙️</button>
+                                <button class="btn-icon" title="Minimize">_</button>
+                                <button class="btn-icon" title="Maximize">□</button>
+                                <button class="btn-icon danger" title="Close">✕</button>
+                            </div>
+                        </header>
+                        <div class="property-inspector">
+                            <div class="inspector-group">
+                                <label>Line Style:</label>
+                                <select>
+                                    <option>Solid</option>
+                                    <option>Dotted</option>
+                                </select>
+                            </div>
+                            <div class="inspector-group">
+                                <label>Color:</label>
+                                <input type="color" value="#2962ff">
+                            </div>
+                        </div>
+                        <section>[ Canvas ]</section>
+                    </li>
+
+                    <li>
+                        <header>
+                            <span>Normalized Slope (Acceleration)</span>
+                            <div class="panel-controls">
+                                <button class="btn-icon" title="Settings"
+                                    onclick="this.closest('li').querySelector('.property-inspector').classList.toggle('active')">⚙️</button>
+                                <button class="btn-icon" title="Minimize">_</button>
+                                <button class="btn-icon" title="Maximize">□</button>
+                                <button class="btn-icon danger" title="Close">✕</button>
+                            </div>
+                        </header>
+                        <div class="property-inspector">
+                            <div class="inspector-group">
+                                <label>Source:</label>
+                                <select>
+                                    <option>Normalized Slope (20-Bar)</option>
+                                    <option>Normalized Slope (60-Bar)</option>
+                                </select>
+                            </div>
+                            <div class="inspector-group">
+                                <label>Accel Window:</label>
+                                <select>
+                                    <option>10 Bars</option>
+                                    <option>20 Bars</option>
+                                </select>
+                            </div>
+                            <div class="inspector-group">
+                                <label>Smoothing:</label>
+                                <select>
+                                    <option>SMA</option>
+                                    <option>HMA</option>
+                                    <option>None</option>
+                                </select>
+                            </div>
+                        </div>
+                        <section>[ Canvas ]</section>
+                    </li>
+                </details>
+            </ul>
+
+            <!-- ITBEES Panel -->
+            <ul>
+                <details>
+                    <summary>ITBEES</summary>
+
+                    <li>
+                        <header>Price Action</header>
+                        <section>[ Canvas ]</section>
+                    </li>
+                </details>
+            </ul>
+        </article>
+    </main>
+
+
+    <script type="module">
+        import { TICKERS } from './data_list/tickers.js';
+        import { DERIVATIVES_CONFIG, SMOOTHING_OPTIONS } from './data_list/derivatives.js';
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Load Tickers
+            const tickerContainer = document.getElementById('ticker-list-container');
+            const tickerFrag = document.createDocumentFragment();
+            TICKERS.forEach(stock => {
+                const label = document.createElement('label');
+                label.innerHTML = `<input type="checkbox" name="stock" value="${stock.symbol}"> ${stock.name}`;
+                tickerFrag.appendChild(label);
+            });
+            tickerContainer.appendChild(tickerFrag);
+
+            // Search wiring function
+            const wireSearch = (containerId) => {
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                const searchInput = container.parentElement.querySelector('input[type="search"]');
+                if (searchInput) {
+                    searchInput.addEventListener('input', (e) => {
+                        const term = e.target.value.toLowerCase();
+                        container.parentElement.querySelectorAll('label').forEach(label => {
+                            const text = label.textContent.toLowerCase();
+                            label.style.display = text.includes(term) ? 'flex' : 'none';
+                        });
+                    });
+                }
+            };
+            wireSearch('ticker-list-container');
+
+            // 2. Load Derivatives (1st and 2nd Order)
+            const form1st = document.getElementById('dropdown-1st-order');
+            const form2nd = document.getElementById('dropdown-2nd-order');
+
+            DERIVATIVES_CONFIG.forEach(deriv => {
+                const label = document.createElement('label');
+                // Adding tooltip title
+                label.title = `${deriv.what_is_it}\n\nCalc: ${deriv.calculation}\nUsage: ${deriv.usage}`;
+                label.innerHTML = `<input type="checkbox" name="derivative" value="${deriv.id}"> ${deriv.name}`;
+
+                if (deriv.category === '1st_order') {
+                    form1st.appendChild(label);
+                } else {
+                    form2nd.appendChild(label);
+                }
+            });
+
+            wireSearch('dropdown-1st-order');
+            wireSearch('dropdown-2nd-order');
+
+
+            wireSearch('dropdown-1st-order');
+            wireSearch('dropdown-2nd-order');
+
+        });
+    </script>
+</body>
+
+</html>

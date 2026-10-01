@@ -1,3 +1,20 @@
+- Behaviour_signature:
+    - Problem Statement
+        - In a given trend Direction and Magnitude, Which stocks moves more and has higher occurance of returns
+    - Solution Overview
+        - Derivatives
+            - Normalized Slope (Direction + Speed)
+            - R-Squared (Trend Cleanliness / Choppiness)
+            - Normalized Standard Deviation of Residuals (Noise Size / Stop-Loss Width)
+            - t-Statistic of the Slope (Trend Reliability / Is it luck?)            
+            
+    - Strength
+        - low
+        - medium
+        - strong
+    - Movement
+        - Smooth / choppy.
+
 - Attributes
     - trend
         - Direction
@@ -7,3 +24,4 @@
         - Trend Reliability: T-stat
         - Trend Stability: Rolling change of in Slope.
         - Noise Size : Std of Residual.
+    - Strucitre

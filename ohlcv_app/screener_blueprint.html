@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Screener Blueprint</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-base: #f8f9fa;
+            --bg-surface: #ffffff;
+            --bg-panel: #f1f3f5;
+            --bg-hover: #e9ecef;
+            --text-main: #212529;
+            --text-muted: #868e96;
+            --accent: #228be6;
+            --danger: #fa5252;
+            --success: #12b886;
+            --border-color: #dee2e6;
+            --spacing-sm: 8px;
+            --spacing-md: 16px;
+            --spacing-lg: 24px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-base);
+            color: var(--text-main);
+            margin: 0;
+            padding: var(--spacing-lg);
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-lg);
+        }
+
+        /* Rule Builder Section */
+        .screener-builder {
+            background: var(--bg-surface);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            padding: var(--spacing-lg);
+        }
+
+        .screener-builder header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--spacing-md);
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: var(--spacing-sm);
+        }
+
+        .screener-builder h2 {
+            margin: 0;
+            font-size: 18px;
+            color: var(--text-main);
+        }
+
+        .rule-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--spacing-sm);
+            margin-bottom: var(--spacing-md);
+        }
+
+        .rule-row {
+            display: flex;
+            align-items: center;
+            gap: var(--spacing-sm);
+            background: var(--bg-panel);
+            padding: var(--spacing-sm) var(--spacing-md);
+            border-radius: 6px;
+        }
+
+        .rule-row select, .rule-row input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            background: var(--bg-surface);
+        }
+
+        .rule-row input {
+            width: 80px;
+        }
+
+        .btn-icon {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            color: var(--text-muted);
+        }
+        
+        .btn-icon.danger:hover { color: var(--danger); }
+
+        .builder-actions {
+            display: flex;
+            gap: var(--spacing-md);
+        }
+
+        .btn-primary, .btn-secondary {
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s ease;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 4px rgba(34, 139, 230, 0.3);
+        }
+
+        .btn-primary:hover { background: #1c7ed6; }
+
+        .btn-secondary {
+            background: var(--bg-panel);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-secondary:hover { background: var(--bg-hover); }
+
+        /* Results Table Section */
+        .screener-results {
+            background: var(--bg-surface);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            overflow: hidden;
+        }
+
+        .screener-results header {
+            padding: var(--spacing-md) var(--spacing-lg);
+            background: var(--bg-panel);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        thead {
+            background: var(--bg-base);
+        }
+
+        th, td {
+            padding: 12px var(--spacing-lg);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        th {
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 12px;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            transition: background 0.2s ease;
+            cursor: pointer;
+        }
+
+        tbody tr:hover {
+            background: var(--bg-hover);
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .badge.bullish { background: #e3fafc; color: #0c8599; }
+        .badge.bearish { background: #fff5f5; color: #c92a2a; }
+
+    </style>
+</head>
+<body>
+
+    <!-- RULE BUILDER -->
+    <section class="screener-builder">
+        <header>
+            <h2>Strategy Screener</h2>
+            <span style="color: var(--text-muted); font-size: 14px;">Scanning 150 ETFs</span>
+        </header>
+
+        <div class="rule-list">
+            <!-- Rule 1 -->
+            <div class="rule-row">
+                <span style="font-weight: 600; color: var(--accent); width: 40px;">IF</span>
+                <select>
+                    <option>Normalized Slope</option>
+                    <option>Volatility Coil</option>
+                    <option>R-Squared</option>
+                </select>
+                <select>
+                    <option>is greater than (>)</option>
+                    <option>is less than (<)</option>
+                    <option>crosses above</option>
+                </select>
+                <input type="number" value="80">
+                <button class="btn-icon danger" title="Remove Rule">✕</button>
+            </div>
+
+            <!-- Rule 2 -->
+            <div class="rule-row">
+                <span style="font-weight: 600; color: var(--text-muted); width: 40px;">AND</span>
+                <select>
+                    <option>Volatility Coil</option>
+                    <option>Normalized Slope</option>
+                </select>
+                <select>
+                    <option>is less than (<)</option>
+                    <option>is greater than (>)</option>
+                </select>
+                <input type="number" value="0">
+                <button class="btn-icon danger" title="Remove Rule">✕</button>
+            </div>
+        </div>
+
+        <div class="builder-actions">
+            <button class="btn-secondary">➕ Add Condition</button>
+            <button class="btn-primary">▶ Run Scan</button>
+        </div>
+    </section>
+
+    <!-- RESULTS TABLE -->
+    <section class="screener-results">
+        <header>
+            <span>Scan Results (3 Matches)</span>
+            <span style="color: var(--text-muted); font-size: 13px;">Click a row to open in Chart Mode</span>
+        </header>
+        <table>
+            <thead>
+                <tr>
+                    <th>Ticker</th>
+                    <th>Last Close</th>
+                    <th>Norm Slope (Rank)</th>
+                    <th>Volatility Coil</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="font-weight: 600; color: var(--accent);">GOLDBEES</td>
+                    <td>₹ 54.20</td>
+                    <td>95.2</td>
+                    <td>-2.4</td>
+                    <td><span class="badge bullish">STRONG PASS</span></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; color: var(--accent);">BANKBEES</td>
+                    <td>₹ 480.15</td>
+                    <td>82.1</td>
+                    <td>-0.8</td>
+                    <td><span class="badge bullish">PASS</span></td>
+                </tr>
+                <tr>
+                    <td style="font-weight: 600; color: var(--accent);">ITBEES</td>
+                    <td>₹ 36.40</td>
+                    <td>80.5</td>
+                    <td>-1.1</td>
+                    <td><span class="badge bullish">PASS</span></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
+
+</body>
+</html>
