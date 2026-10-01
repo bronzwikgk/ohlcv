@@ -1592,6 +1592,22 @@ window.removeMarkerRule = function(stockSymbol, index) {
     }
 };
 
+window.updateMarkerRule = function(stockSymbol, index, opId, valId, shapeId, lbId) {
+    const state = loadState();
+    if (state.markers && state.markers[stockSymbol]) {
+        const rule = state.markers[stockSymbol][index];
+        if (rule) {
+            rule.operator = document.getElementById(opId).value;
+            rule.threshold = parseFloat(document.getElementById(valId).value) || 0;
+            rule.shape = document.getElementById(shapeId).value;
+            const lbElem = document.getElementById(lbId);
+            if (lbElem) rule.overrideLookback = lbElem.value;
+            saveState(state);
+            window.triggerUpdate();
+        }
+    }
+};
+
 window.clearMarkers = function(stockSymbol, derivId) {
     const state = loadState();
     if (state.markers && state.markers[stockSymbol]) {
@@ -1643,10 +1659,33 @@ window.renderActiveMarkers = function(stockSymbol) {
         const listDiv = document.getElementById('markers-list-' + stockSymbol + '-' + panelId);
         if (listDiv) {
             listDiv.innerHTML = grouped[panelId].map(r => {
-                const prefix = (r.derivId && r.derivId !== panelId) ? r.derivId + ' ' : '';
-                return '<div style="display:flex; justify-content:space-between; align-items:center; margin-top:4px; padding:4px; background:rgba(255,255,255,0.05); border-radius:4px;">' +
-                '<span style="font-size: 10px;">' + prefix + r.operator + ' ' + r.threshold + ' → ' + r.shape + '</span>' +
-                '<button onclick="window.removeMarkerRule(\'' + stockSymbol + '\', ' + r.index + ')" style="background:none; border:none; color:#ff5252; cursor:pointer;">✕</button>' +
+                const prefix = (r.derivId && r.derivId !== panelId) ? r.derivId : '';
+                const opId = `m-upd-op-${stockSymbol}-${r.index}`;
+                const valId = `m-upd-val-${stockSymbol}-${r.index}`;
+                const shapeId = `m-upd-shape-${stockSymbol}-${r.index}`;
+                const lbId = `m-upd-lb-${stockSymbol}-${r.index}`;
+                
+                let lbHtml = '';
+                if (r.overrideLookback || (r.derivId && r.derivId.startsWith('pivot'))) {
+                    lbHtml = `<input type="text" class="inspector-input" id="${lbId}" value="${r.overrideLookback || '5:2:0'}" style="width:50px; padding:2px; font-size:9px;" title="Lookback">`;
+                }
+
+                return '<div style="display:flex; flex-direction:column; margin-top:6px; padding:6px; background:rgba(255,255,255,0.05); border-radius:4px; gap:4px;">' +
+                    (prefix ? '<div style="font-size:9px; font-weight:bold; color:var(--text-muted);">' + prefix + '</div>' : '') +
+                    '<div style="display:flex; justify-content:space-between; align-items:center; gap:4px;">' +
+                        `<select class="inspector-input" id="${opId}" style="width:35px; padding:2px; font-size:10px;">
+                            <option value=">" ${r.operator === '>' ? 'selected' : ''}>&gt;</option>
+                            <option value="<" ${r.operator === '<' ? 'selected' : ''}>&lt;</option>
+                        </select>` +
+                        `<input type="text" class="inspector-input" id="${valId}" value="${r.threshold}" style="width:45px; padding:2px; font-size:10px;" title="Threshold">` +
+                        lbHtml +
+                        `<select class="inspector-input" id="${shapeId}" style="width:50px; padding:2px; font-size:10px;">
+                            <option value="arrowUp" ${r.shape === 'arrowUp' ? 'selected' : ''}>Up</option>
+                            <option value="arrowDown" ${r.shape === 'arrowDown' ? 'selected' : ''}>Dn</option>
+                        </select>` +
+                        `<button onclick="window.updateMarkerRule('${stockSymbol}', ${r.index}, '${opId}', '${valId}', '${shapeId}', '${lbId}')" class="btn" style="padding:2px 4px; font-size:10px;">Upd</button>` +
+                        `<button onclick="window.removeMarkerRule('${stockSymbol}', ${r.index})" style="background:none; border:none; color:#ff5252; cursor:pointer; font-size:10px; padding:2px;">✕</button>` +
+                    '</div>' +
                 '</div>';
             }).join('');
         }
