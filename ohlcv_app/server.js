@@ -101,7 +101,8 @@ const server = http.createServer((req, res) => {
     }
 
     // Static File Server
-    let filePath = path.join(FRONTEND_DIR, req.url === '/' ? 'ohlcv_app/index.html' : req.url);
+    const cleanUrl = req.url.split('?')[0];
+    let filePath = path.join(FRONTEND_DIR, cleanUrl === '/' ? 'ohlcv_app/index.html' : cleanUrl);
     const extname = String(path.extname(filePath)).toLowerCase();
     const contentType = mimeTypes[extname] || 'application/octet-stream';
 

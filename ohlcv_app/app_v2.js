@@ -2,6 +2,21 @@ import { TICKERS } from './data_list/tickers.js';
 import { DERIVATIVES_CONFIG, SMOOTHING_OPTIONS } from './data_list/derivatives.js';
 import { computeDerivatives, computeReturnsProfile } from './math.js';
 
+window.STRATEGY_TRADES = {};
+window.CURRENT_STRATEGY_FILE = null;
+
+function updateDebugInfo(msg) {
+    let debugDiv = document.getElementById('marker-debug');
+    if (!debugDiv) {
+        debugDiv = document.createElement('div');
+        debugDiv.id = 'marker-debug';
+        debugDiv.style = 'position:fixed; bottom:10px; right:10px; background:rgba(0,0,0,0.8); color:#00ff00; padding:10px; z-index:9999; font-family:monospace; font-size:12px; pointer-events:none; white-space:pre-wrap;';
+        document.body.appendChild(debugDiv);
+    }
+    debugDiv.innerHTML = msg;
+}
+
+
 // --- TIMEFRAME AGGREGATION ---
 function getWeekStart(dateStr) {
     const d = new Date(dateStr);
@@ -206,12 +221,34 @@ function gatherStateFromUI() {
 // --- RENDER ENGINE ---
 let globalChartObserver = null;
 
+let isRendering = false;
+let currentRenderId = 0;
 async function renderCharts(state) {
+    if (isRendering) return; // Simple lock
+    const renderId = ++currentRenderId;
+    isRendering = true;
+    try {
     const mainContainer = document.getElementById('main-chart-container');
     mainContainer.innerHTML = '';
     
     if (globalChartObserver) {
         globalChartObserver.disconnect();
+    }
+    
+    // Load Strategy File dynamically
+    const strategyFile = state.strategyFile || 'strategy_trades.json';
+    if (window.CURRENT_STRATEGY_FILE !== strategyFile) {
+        try {
+            const r = await fetch(strategyFile + '?t=' + Date.now());
+            if (r.ok) {
+                window.STRATEGY_TRADES = await r.json();
+                window.CURRENT_STRATEGY_FILE = strategyFile;
+            } else {
+                window.STRATEGY_TRADES = {};
+            }
+        } catch (e) {
+            window.STRATEGY_TRADES = {};
+        }
     }
 
     if (state.stocks.length === 0) {
@@ -294,8 +331,7 @@ async function renderCharts(state) {
                                         <div style="margin-bottom: 8px;">
                                             <select class="inspector-input" style="width: 100%;" onchange="window.applyMarkerTemplate(this, '${stockSymbol}', 'price')">
                                                 <option value="">-- Quick Templates --</option>
-                                                <option value='{"op":">","val":0,"shape":"arrowDown","overrideDerivId":"pivot_high", "overrideLookback": "5:2:0"}'>Pivot Point High (5:2)</option>
-                                                <option value='{"op":">","val":0,"shape":"arrowUp","overrideDerivId":"pivot_low", "overrideLookback": "5:2:0"}'>Pivot Point Low (5:2)</option>
+                                                <option value='{"op":">","val":0,"shape":"arrowDown","overrideDerivId":"pivot_zigzag", "overrideLookback": "1:1:0"}'>ZigZag Structure (1:1)</option>
                                             </select>
                                         </div>
                                         <div style="display: flex; gap: 4px; margin-bottom: 8px;">
@@ -310,11 +346,10 @@ async function renderCharts(state) {
                                         </div>
                                         <div style="font-size:10px; margin-top:12px; margin-bottom:8px; color:var(--text-muted); font-weight:bold;">CUSTOM PIVOT MARKER</div>
                                         <div style="display: flex; gap: 4px; margin-bottom: 8px;">
-                                            <select class="inspector-input" id="pivot-type-${stockSymbol}" style="width: 60px;">
-                                                <option value="pivot_high">High</option>
-                                                <option value="pivot_low">Low</option>
+                                            <select class="inspector-input" id="pivot-type-${stockSymbol}" style="width: 80px;">
+                                                <option value="pivot_zigzag">ZigZag</option>
                                             </select>
-                                            <input type="text" class="inspector-input" id="pivot-lb-${stockSymbol}" placeholder="5:2:0" style="width: 65px;" value="5:2:0">
+                                            <input type="text" class="inspector-input" id="pivot-lb-${stockSymbol}" placeholder="1:1:0" style="width: 65px;" value="1:1:0">
                                             <button onclick="window.addPivotMarker('${stockSymbol}')" class="btn" style="padding: 2px 8px;">Add Pivot</button>
                                         </div>
                                         <div id="markers-list-${stockSymbol}-price" style="font-size:11px;"></div>
@@ -480,8 +515,7 @@ async function renderCharts(state) {
                                         <div style="margin-bottom: 8px;">
                                             <select class="inspector-input" style="width: 100%;" onchange="window.applyMarkerTemplate(this, '${stockSymbol}', '${instanceId}')">
                                                 <option value="">-- Quick Templates --</option>
-                                                <option value='{"op":">","val":0,"shape":"arrowDown","overrideDerivId":"pivot_high", "overrideLookback": "5:2:0"}'>Pivot Point High (5:2)</option>
-                                                <option value='{"op":">","val":0,"shape":"arrowUp","overrideDerivId":"pivot_low", "overrideLookback": "5:2:0"}'>Pivot Point Low (5:2)</option>
+                                                <option value='{"op":">","val":0,"shape":"arrowDown","overrideDerivId":"pivot_zigzag", "overrideLookback": "1:1:0"}'>ZigZag Structure (1:1)</option>
                                             </select>
                                         </div>
                                         <div style="display: flex; gap: 4px; margin-bottom: 8px;">
@@ -496,11 +530,10 @@ async function renderCharts(state) {
                                         </div>
                                         <div style="font-size:10px; margin-top:12px; margin-bottom:8px; color:var(--text-muted); font-weight:bold;">CUSTOM PIVOT MARKER</div>
                                         <div style="display: flex; gap: 4px; margin-bottom: 8px;">
-                                            <select class="inspector-input" id="pivot-type-${stockSymbol}-${instanceId}" style="width: 60px;">
-                                                <option value="pivot_high">High</option>
-                                                <option value="pivot_low">Low</option>
+                                            <select class="inspector-input" id="pivot-type-${stockSymbol}-${instanceId}" style="width: 80px;">
+                                                <option value="pivot_zigzag">ZigZag</option>
                                             </select>
-                                            <input type="text" class="inspector-input" id="pivot-lb-${stockSymbol}-${instanceId}" placeholder="5:2:0" style="width: 65px;" value="5:2:0">
+                                            <input type="text" class="inspector-input" id="pivot-lb-${stockSymbol}-${instanceId}" placeholder="1:1:0" style="width: 65px;" value="1:1:0">
                                             <button onclick="window.addPivotMarker('${stockSymbol}', '${instanceId}')" class="btn" style="padding: 2px 8px;">Add Pivot</button>
                                         </div>
                                         <div id="markers-list-${stockSymbol}-${instanceId}" style="font-size:11px;"></div>
@@ -668,63 +701,219 @@ async function renderCharts(state) {
         }
 
         // Apply Markers
-        if (state.markers && state.markers[stockSymbol] && currentPriceSeries) {
-            const markersToDraw = [];
+        const markersByPanel = {};
+        if (state.markers && state.markers[stockSymbol]) {
+            
             state.markers[stockSymbol].forEach(rule => {
                 let dData = [];
-                if (rule.derivId === 'price') {
-                    dData = dataset.data.map(d => ({ time: d.time, value: d.close }));
+                const targetPanel = rule.originPanelId || 'price';
+                
+                // Get the base data to evaluate against
+                if (targetPanel === 'price') {
+                    dData = dataset.data; // Use raw OHLC dataset
                 } else {
-                    const derivDataSets = dataset.derivData[rule.derivId];
+                    const derivDataSets = dataset.derivData[targetPanel];
                     if (!derivDataSets || derivDataSets.length === 0) return;
                     let targetDataset = derivDataSets[0]; // Use primary lookback
-                    if (rule.overrideLookback) {
+                    if (rule.overrideLookback && !rule.derivId.startsWith('pivot')) {
                         targetDataset = derivDataSets.find(ds => ds.lookback === rule.overrideLookback) || targetDataset;
                     }
                     dData = targetDataset.data;
                 }
                 
-                dData.forEach((point) => {
-                    if (point.value === null) return;
-                    let triggered = false;
-                    if (rule.operator === '>' && point.value > rule.threshold) triggered = true;
-                    if (rule.operator === '<' && point.value < rule.threshold) triggered = true;
-                    
-                    if (triggered) {
-                        let markerText = '';
-                        if (rule.derivId === 'pivot_high') markerText = 'H';
-                        else if (rule.derivId === 'pivot_low') markerText = 'L';
-                        else markerText = rule.shape === 'arrowUp' ? '▲' : '▼';
-                        
-                        markersToDraw.push({
-                            time: point.time,
-                            position: rule.shape === 'arrowUp' ? 'belowBar' : 'aboveBar',
-                            color: rule.shape === 'arrowUp' ? '#00e676' : '#ff1744',
-                            shape: rule.shape,
-                            text: markerText
-                        });
+                // If rule is a pivot, compute it dynamically over dData
+                if (rule.derivId.startsWith('pivot')) {
+                    let lookback = 5;
+                    let lookahead = 5;
+                    let threshold = 0;
+                    if (rule.overrideLookback) {
+                        const parts = String(rule.overrideLookback).split(':');
+                        lookback = parseInt(parts[0]) || 5;
+                        lookahead = parseInt(parts[1]) || lookback;
+                        threshold = parseFloat(parts[2]) || 0;
                     }
-                });
-            });
-            
-            // LWC requires markers to be sorted by time
-            markersToDraw.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
-            
-            // LWC also requires unique times per series. For simplicity, group by time.
-            const uniqueMarkers = {};
-            markersToDraw.forEach(m => {
-                uniqueMarkers[m.time] = m;
-            });
-            const uniqueMarkersArray = Object.values(uniqueMarkers);
-            if (currentPriceSeries.setMarkers) {
-                currentPriceSeries.setMarkers(uniqueMarkersArray);
-            } else if (LightweightCharts.createSeriesMarkers) {
-                const markersPrimitive = LightweightCharts.createSeriesMarkers(currentPriceSeries, uniqueMarkersArray);
-                if (currentPriceSeries.attachPrimitive) {
-                    currentPriceSeries.attachPrimitive(markersPrimitive);
+                    
+                    let rawPivots = [];
+                    for (let i = lookback; i < dData.length - lookahead; i++) {
+                        let hVal = targetPanel === 'price' ? dData[i].high : dData[i].value;
+                        let lVal = targetPanel === 'price' ? dData[i].low : dData[i].value;
+                        if (rule.derivId.includes('close') || rule.derivId === 'pivot_zigzag') {
+                            hVal = targetPanel === 'price' ? dData[i].close : dData[i].value;
+                            lVal = hVal;
+                        }
+                        
+                        if (hVal === null || hVal === undefined || lVal === null || lVal === undefined) continue;
+                        
+                        let isHigh = true;
+                        let isLow = true;
+                        
+                        const threshValH = Math.abs(hVal * (threshold / 100));
+                        const threshValL = Math.abs(lVal * (threshold / 100));
+                        
+                        // Check Highs
+                        if (rule.derivId.includes('high') || rule.derivId === 'pivot_zigzag' || rule.derivId.includes('close')) {
+                            for (let j = 1; j <= Math.max(lookback, lookahead); j++) {
+                                if (j <= lookback) {
+                                    let compH = targetPanel === 'price' ? ((rule.derivId.includes('close') || rule.derivId === 'pivot_zigzag') ? dData[i-j].close : dData[i-j].high) : dData[i-j].value;
+                                    if (compH !== null && compH !== undefined && hVal <= compH + threshValH) isHigh = false;
+                                }
+                                if (j <= lookahead) {
+                                    let compH = targetPanel === 'price' ? ((rule.derivId.includes('close') || rule.derivId === 'pivot_zigzag') ? dData[i+j].close : dData[i+j].high) : dData[i+j].value;
+                                    if (compH !== null && compH !== undefined && hVal <= compH + threshValH) isHigh = false;
+                                }
+                            }
+                        } else { isHigh = false; }
+                        
+                        // Check Lows
+                        if (rule.derivId.includes('low') || rule.derivId === 'pivot_zigzag' || rule.derivId.includes('close')) {
+                            for (let j = 1; j <= Math.max(lookback, lookahead); j++) {
+                                if (j <= lookback) {
+                                    let compL = targetPanel === 'price' ? ((rule.derivId.includes('close') || rule.derivId === 'pivot_zigzag') ? dData[i-j].close : dData[i-j].low) : dData[i-j].value;
+                                    if (compL !== null && compL !== undefined && lVal >= compL - threshValL) isLow = false;
+                                }
+                                if (j <= lookahead) {
+                                    let compL = targetPanel === 'price' ? ((rule.derivId.includes('close') || rule.derivId === 'pivot_zigzag') ? dData[i+j].close : dData[i+j].low) : dData[i+j].value;
+                                    if (compL !== null && compL !== undefined && lVal >= compL - threshValL) isLow = false;
+                                }
+                            }
+                        } else { isLow = false; }
+                        
+                        if (isHigh) rawPivots.push({ time: dData[i].time, val: hVal, type: 'H' });
+                        if (isLow) rawPivots.push({ time: dData[i].time, val: lVal, type: 'L' });
+                    }
+                    
+                    let finalPivots = rawPivots;
+                    
+                    // Filter for ZigZag paired market structure
+                    if (rule.derivId === 'pivot_zigzag' && rawPivots.length > 0) {
+                        finalPivots = [];
+                        let currentExtreme = rawPivots[0];
+                        
+                        for (let k = 1; k < rawPivots.length; k++) {
+                            let curr = rawPivots[k];
+                            
+                            // Prevent same-candle H and L collision
+                            if (curr.time === currentExtreme.time) {
+                                // If same candle has both, prefer the one that continues the alternating structure, 
+                                // or just skip the conflicting one if we can't determine.
+                                continue; 
+                            }
+                            
+                            if (curr.type === currentExtreme.type) {
+                                // If we see consecutive Highs (or Lows) without a flip in between:
+                                // We MUST keep only the most extreme one.
+                                if (curr.type === 'H' && curr.val >= currentExtreme.val) {
+                                    currentExtreme = curr;
+                                } else if (curr.type === 'L' && curr.val <= currentExtreme.val) {
+                                    currentExtreme = curr;
+                                }
+                                // If the current is LESS extreme, we simply ignore it and keep looking for a flip.
+                            } else {
+                                // Type flipped! The previous extreme is confirmed as a structural pivot.
+                                finalPivots.push(currentExtreme);
+                                currentExtreme = curr;
+                            }
+                        }
+                        finalPivots.push(currentExtreme);
+                    }
+                    
+                    finalPivots.forEach(p => {
+                        if (!markersByPanel[targetPanel]) markersByPanel[targetPanel] = [];
+                        markersByPanel[targetPanel].push({
+                            time: p.time,
+                            position: p.type === 'H' ? 'aboveBar' : 'belowBar',
+                            color: p.type === 'H' ? '#ff1744' : '#00e676',
+                            shape: p.type === 'H' ? 'arrowDown' : 'arrowUp',
+                            text: p.type
+                        });
+                    });
+                } else {
+                    // Standard threshold evaluation
+                    dData.forEach((point) => {
+                        let evalVal = targetPanel === 'price' ? point.close : point.value;
+                        if (evalVal === null || evalVal === undefined) return;
+                        
+                        let triggered = false;
+                        if (rule.operator === '>' && evalVal > rule.threshold) triggered = true;
+                        if (rule.operator === '<' && evalVal < rule.threshold) triggered = true;
+                        
+                        if (triggered) {
+                            if (!markersByPanel[targetPanel]) markersByPanel[targetPanel] = [];
+                            markersByPanel[targetPanel].push({
+                                time: point.time,
+                                position: rule.shape === 'arrowUp' ? 'belowBar' : 'aboveBar',
+                                color: rule.shape === 'arrowUp' ? '#00e676' : '#ff1744',
+                                shape: rule.shape,
+                                text: rule.shape === 'arrowUp' ? '▲' : '▼'
+                            });
+                        }
+                    });
                 }
-            }
+            });
         }
+            
+        // Add custom backtest trades if they exist for this stock
+            if (window.STRATEGY_TRADES && window.STRATEGY_TRADES[stockSymbol]) {
+                const trades = window.STRATEGY_TRADES[stockSymbol];
+                const activePanels = stockCharts.map(c => c.panelId);
+                
+                activePanels.forEach(pId => {
+                    if (!markersByPanel[pId]) markersByPanel[pId] = [];
+                    trades.forEach(t => {
+                        // Entry Marker
+                        markersByPanel[pId].push({
+                            time: t.entry_time, position: 'belowBar', color: '#00e676', shape: 'arrowUp', text: 'BUY'
+                        });
+                        // Exit Marker
+                        markersByPanel[pId].push({
+                            time: t.exit_time, position: 'aboveBar', color: t.profit > 0 ? '#ff1744' : '#ff9100', shape: 'arrowDown', text: `SELL ${(t.profit * 100).toFixed(1)}%`
+                        });
+                    });
+                });
+            }
+            
+            // Attach markers to the correct charts
+            let debugMsg = `STRATEGY_TRADES Loaded? ${!!window.STRATEGY_TRADES}\n`;
+            if (window.STRATEGY_TRADES) debugMsg += `Has ${stockSymbol}? ${!!window.STRATEGY_TRADES[stockSymbol]}\n`;
+            
+            Object.keys(markersByPanel).forEach(panelId => {
+                let targetSeries = null;
+                if (panelId === 'price') {
+                    targetSeries = currentPriceSeries;
+                } else {
+                    const chartObj = stockCharts.find(c => c.panelId === panelId);
+                    if (chartObj && chartObj.seriesGroup && chartObj.seriesGroup.length > 0) {
+                        targetSeries = chartObj.seriesGroup[0].series;
+                    }
+                }
+                
+                if (targetSeries) {
+                    const markers = markersByPanel[panelId];
+                    markers.sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
+                    
+                    const uniqueMarkers = {};
+                    markers.forEach(m => { uniqueMarkers[m.time] = m; });
+                    const uniqueMarkersArray = Object.values(uniqueMarkers);
+                    
+                    debugMsg += `Panel [${panelId}] trying to attach ${uniqueMarkersArray.length} markers.\n`;
+                    
+                    try {
+                        if (targetSeries.setMarkers) {
+                            targetSeries.setMarkers(uniqueMarkersArray);
+                            debugMsg += `Panel [${panelId}] setMarkers SUCCESS\n`;
+                        } else if (LightweightCharts.createSeriesMarkers) {
+                            const markersPrimitive = LightweightCharts.createSeriesMarkers(targetSeries, uniqueMarkersArray);
+                            if (targetSeries.attachPrimitive) {
+                                targetSeries.attachPrimitive(markersPrimitive);
+                                debugMsg += `Panel [${panelId}] attachPrimitive SUCCESS\n`;
+                            }
+                        }
+                    } catch (err) {
+                        debugMsg += `Panel [${panelId}] ERROR: ${err.message}\n`;
+                    }
+                }
+            });
+            updateDebugInfo(debugMsg);
 
         // Sync logic for this stock's charts
         stockCharts.forEach((source) => {
@@ -804,6 +993,9 @@ async function renderCharts(state) {
     document.querySelectorAll('.overlay-checkbox:checked').forEach(cb => {
         window.toggleOverlayInput(cb);
     });
+    } finally {
+        isRendering = false;
+    }
 }
 
 // --- BULK ACTIONS ---
@@ -1081,7 +1273,9 @@ window.updateOverlayFromDropdown = (elem) => {
     if (!container || !container._chartInstance || !container._mainData) return;
 
     if (container._overlaySeriesGroup) {
-        container._overlaySeriesGroup.forEach(grp => container._chartInstance.removeSeries(grp.series));
+        container._overlaySeriesGroup.forEach(grp => {
+            try { container._chartInstance.removeSeries(grp.series); } catch (e) { console.warn('Could not remove series', e); }
+        });
         container._overlaySeriesGroup = [];
     } else {
         container._overlaySeriesGroup = [];
@@ -1352,9 +1546,11 @@ document.addEventListener('DOMContentLoaded', async () => {
     });
 
     const triggerUpdate = async () => {
+        const scrollPos = window.scrollY;
         const newState = gatherStateFromUI();
         saveState(newState);
         await renderCharts(newState);
+        window.scrollTo(0, scrollPos);
     };
     
     window.triggerUpdate = triggerUpdate;
@@ -1628,6 +1824,14 @@ window.applyMarkerTemplate = function(selectElement, stockSymbol, derivId) {
     const state = loadState();
     if (!state.markers) state.markers = {};
     if (!state.markers[stockSymbol]) state.markers[stockSymbol] = [];
+    
+    // Auto-clear existing pivot rules for this panel if applying a new pivot template
+    const newDerivId = template.overrideDerivId || derivId;
+    if (newDerivId.startsWith('pivot')) {
+        state.markers[stockSymbol] = state.markers[stockSymbol].filter(r => 
+            !(r.originPanelId === derivId && (r.derivId && r.derivId.startsWith('pivot')))
+        );
+    }
     
     state.markers[stockSymbol].push({
         derivId: template.overrideDerivId || derivId,
